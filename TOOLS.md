@@ -56,5 +56,6 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 - Client ID：`cli_3802f9db08b811f197679c63c078bacc`
 - 知识库配额：每日1000次读取
 - **API Base URL：`https://openapi.biji.com`（永远使用此域名，不要换其他）**
+- 注意：`api.getnote.ai` 域名错误，DNS无法解析
 
 Add whatever helps you do your job. This is your cheat sheet.

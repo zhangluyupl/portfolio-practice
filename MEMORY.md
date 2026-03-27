@@ -25,11 +25,20 @@
 - **天气**：wttr.in/Beijing
 
 ## 日常任务（Cron）
-- **每日早安推送**：每天 18:00 执行，推送内容：北京时间天气+穿衣建议+一首诗词+知识库每日一句
-  - cron key: d8988587-ffa0-46f1-9027-9957193806bb
+- **每日早安推送**：每天 09:00 执行，推送内容：北京时间天气+穿衣建议+一首诗词+知识库每日一句
+  - cron key: (待确认，March 25重新配置)
   - 知识库"养育男孩"每日一句可从 GetNote 获取
+- **每日育儿推送**：每天 18:00 执行，推送内容：适合5岁男孩的育儿经验
+  - cron key: d8988587-ffa0-46f1-9027-9957193806bb
+  - 已知问题：原60s超时失败，已调整为120s
 
 ## 学到的模式
 - OpenClaw = 任务调度系统，复杂任务分"探索"和"收口"两轮
 - 上下文要精简，避免 token 浪费
 - 微信推送用 `openclaw message send -c wechat -r o9cq809eGr7RPqXvU6WWeqETSpKA@im.wechat`
+
+## 视频生产项目
+- 仓库：zhangluyupl/video-production（已推送）
+- 脚本：scripts/production_pipeline.py
+- 依赖 FFmpeg（已通过 homebrew 安装）
+- **已知问题**：视频片段6秒 vs 配音99秒，需循环拼接；M2-her 可能不按JSON schema输出，已改用【SCENE】标签格式
