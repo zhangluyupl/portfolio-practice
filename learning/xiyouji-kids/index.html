@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>西游记·萌娃学文化</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --primary: #FF6B35;
+      --secondary: #4ECDC4;
+      --gold: #FFD93D;
+      --dark: #2D3436;
+      --light: #FFF8E7;
+      --pink: #FF8FAB;
+      --purple: #9B59B6;
+      --sky: #74B9FF;
+      --green: #00B894;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ========== 顶部进度条 ========== */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(135deg, #FF6B35, #FF8E53);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+    }
+
+    .top-bar .stars {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .top-bar .stars .star-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .top-title {
+      flex: 1;
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .top-back {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ========== 页面容器 ========== */
+    .page {
+      display: none;
+      min-height: 100vh;
+      padding-top: 60px;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== 首页地图 ========== */
+    .home-page {
+      background: linear-gradient(180deg, #FFF8E7 0%, #FFE4C4 100%);
+      padding: 20px;
+      padding-bottom: 40px;
+    }
+
+    .welcome-text {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .welcome-text h1 {
+      font-size: 28px;
+      color: #FF6B35;
+      margin-bottom: 5px;
+    }
+
+    .welcome-text p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .map-door {
+      background: white;
+      border-radius: 24px;
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-door:active {
+      transform: scale(0.96);
+    }
+
+    .map-door::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+    }
+
+    .map-door.story::before { background: #FF6B35; }
+    .map-door.sanjijing::before { background: #4ECDC4; }
+    .map-door.shenglv::before { background: #9B59B6; }
+    .map-door.game::before { background: #FFD93D; }
+
+    .door-icon {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    .door-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .door-desc {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .door-stars {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .door-lock {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 20px;
+      opacity: 0.5;
+    }
+
+    /* ========== 故事页面 ========== */
+    .story-page {
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: white;
+    }
+
+    .story-hero {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .story-hero .sun {
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #FFD93D, #FF6B35);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 60px rgba(255,217,61,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      animation: sunPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes sunPulse {
+      0%, 100% { box-shadow: 0 0 60px rgba(255,217,61,0.5); }
+      50% { box-shadow: 0 0 80px rgba(255,217,61,0.8); }
+    }
+
+    .story-hero h2 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .story-hero p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .story-content {
+      background: rgba(255,255,255,0.05);
+      border-radius: 24px 24px 0 0;
+      padding: 25px;
+      min-height: 50vh;
+    }
+
+    .story-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 20px;
+    }
+
+    .knowledge-card {
+      background: linear-gradient(135deg, rgba(78,205,196,0.2), rgba(78,205,196,0.1));
+      border: 2px solid rgba(78,205,196,0.5);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .knowledge-card h4 {
+      color: #4ECDC4;
+      font-size: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .knowledge-card p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.7;
+    }
+
+    .play-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, #FF6B35, #FF8E53);
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+    }
+
+    .play-btn:active {
+      transform: scale(0.98);
+    }
+
+    .quiz-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .quiz-title {
+      font-size: 16px;
+      color: #FFD93D;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quiz-question {
+      font-size: 15px;
+      margin-bottom: 15px;
+      color: white;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quiz-option {
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:active {
+      transform: scale(0.98);
+    }
+
+    .quiz-option.correct {
+      border-color: #00B894;
+      background: rgba(0,184,148,0.2);
+    }
+
+    .quiz-option.wrong {
+      border-color: #FF6B6B;
+      background: rgba(255,107,107,0.2);
+    }
+
+    .quiz-result {
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      display: none;
+    }
+
+    .quiz-result.success {
+      color: #00B894;
+    }
+
+    .quiz-result.fail {
+      color: #FF6B6B;
+    }
+
+    /* ========== 三字经页面 ========== */
+    .sanjijing-page {
+      background: linear-gradient(180deg, #E8F6F3 0%, #D5E8E4 100%);
+      padding: 20px;
+    }
+
+    .unit-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    .unit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .unit-num {
+      background: linear-gradient(135deg, #4ECDC4, #44A08D);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .unit-stars {
+      font-size: 16px;
+    }
+
+    .sanjijing-text {
+      font-size: 22px;
+      line-height: 2;
+      color: #2D3436;
+      text-align: center;
+      margin: 15px 0;
+      letter-spacing: 3px;
+    }
+
+    .sanjijing-char {
+      display: inline-block;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .sanjijing-char:hover {
+      color: #FF6B35;
+      transform: scale(1.1);
+    }
+
+    .sanjijing-char.highlight {
+      color: #FF6B35;
+      animation: charPop 0.3s ease;
+    }
+
+    @keyframes charPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .meaning-box {
+      background: #FFF8E7;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      border-left: 4px solid #FFD93D;
+    }
+
+    .meaning-box h4 {
+      font-size: 14px;
+      color: #FF6B35;
+      margin-bottom: 8px;
+    }
+
+    .meaning-box p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.7;
+    }
+
+    .read-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #4ECDC4, #44A08D);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    /* ========== 声律启蒙页面 ========== */
+    .shenglv-page {
+      background: linear-gradient(180deg, #F5EEF8 0%, #E8DAEF 100%);
+      padding: 20px;
+    }
+
+    .verse-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    .verse-title {
+      text-align: center;
+      font-size: 20px;
+      color: #9B59B6;
+      margin-bottom: 20px;
+    }
+
+    .verse-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-size: 24px;
+      margin: 15px 0;
+      color: #2D3436;
+    }
+
+    .verse-word {
+      padding: 5px 15px;
+      border-radius: 8px;
+      background: #F5EEF8;
+      transition: all 0.3s ease;
+    }
+
+    .verse-word.active {
+      background: #9B59B6;
+      color: white;
+    }
+
+    .verse-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .verse-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .verse-btn.play {
+      background: #9B59B6;
+      color: white;
+    }
+
+    .verse-btn.match {
+      background: #E8DAEF;
+      color: #9B59B6;
+    }
+
+    /* ========== 游戏页面 ========== */
+    .game-page {
+      background: linear-gradient(180deg, #FFF9E6 0%, #FFF3CC 100%);
+      padding: 20px;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px 15px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .game-card:active {
+      transform: scale(0.96);
+    }
+
+    .game-icon {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    .game-name {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .game-desc {
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* ========== 对对碰游戏 ========== */
+    .match-game {
+      background: linear-gradient(180deg, #E8F6F3 0%, #D5E8E4 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .match-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      max-width: 350px;
+      margin: 20px auto;
+    }
+
+    .match-card {
+      aspect-ratio: 1;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .match-card:active {
+      transform: scale(0.95);
+    }
+
+    .match-card.flipped {
+      background: #4ECDC4;
+      color: white;
+    }
+
+    .match-card.matched {
+      background: #00B894;
+      color: white;
+    }
+
+    .match-score {
+      text-align: center;
+      font-size: 18px;
+      color: #2D3436;
+      margin-bottom: 20px;
+    }
+
+    .match-hint {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 15px;
+    }
+
+    /* ========== Toast ========== */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 15px;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ========== 星星动画 ========== */
+    .star-burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 300;
+      font-size: 40px;
+      animation: starFly 1s ease-out forwards;
+    }
+
+    @keyframes starFly {
+      0% { opacity: 1; transform: scale(1) translateY(0); }
+      100% { opacity: 0; transform: scale(1.5) translateY(-100px); }
+    }
+
+    /* ========== Loading ========== */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+    }
+
+    .loading-overlay.hidden {
+      display: none;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(255,255,255,0.2);
+      border-top-color: #FF6B35;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- 顶部导航 -->
+  <div class="top-bar" id="topBar" style="display:none;">
+    <button class="top-back" onclick="goBack()">←</button>
+    <div class="top-title" id="topTitle">西游记·萌娃学文化</div>
+    <div class="stars">
+      <span class="star-icon">⭐</span>
+      <span id="starCount">0</span>
+    </div>
+  </div>
+
+  <!-- ========== 首页 ========== -->
+  <div class="page active" id="homePage">
+    <div class="home-page" style="padding-top:40px;">
+      <div class="welcome-text">
+        <h1>🌟 西游记·萌娃学文化</h1>
+        <p>跟齐天大圣一起学传统文化</p>
+      </div>
+
+      <div class="map-grid">
+        <div class="map-door story" onclick="openStory()">
+          <div class="door-icon">🐒</div>
+          <div class="door-title">悟空学苑</div>
+          <div class="door-desc">西游记故事</div>
+          <div class="door-stars" id="storyStars">☆☆☆</div>
+          <span class="door-lock" id="storyLock" style="display:none;">🔒</span>
+        </div>
+
+        <div class="map-door sanjijing" onclick="openSanjijing()">
+          <div class="door-icon">📖</div>
+          <div class="door-title">三字经课堂</div>
+          <div class="door-desc">人之初 性本善</div>
+          <div class="door-stars" id="sanjijingStars">☆☆☆</div>
+          <span class="door-lock" id="sanjijingLock" style="display:none;">🔒</span>
+        </div>
+
+        <div class="map-door shenglv" onclick="openShenglv()">
+          <div class="door-icon">🎵</div>
+          <div class="door-title">声律启蒙馆</div>
+          <div class="door-desc">云对雨 雪对风</div>
+          <div class="door-stars" id="shenglvStars">☆☆☆</div>
+          <span class="door-lock" id="shenglvLock" style="display:none;">🔒</span>
+        </div>
+
+        <div class="map-door game" onclick="openGames()">
+          <div class="door-icon">🎮</div>
+          <div class="door-title">游戏乐园</div>
+          <div class="door-desc">边玩边学</div>
+          <div class="door-stars" id="gameStars">☆☆☆</div>
+          <span class="door-lock" id="gameLock" style="display:none;">🔒</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 西游记故事页 ========== -->
+  <div class="page" id="storyPage">
+    <div class="story-page">
+      <div class="story-hero">
+        <div class="sun">🐒</div>
+        <h2 id="storyTitle">大闹天宫</h2>
+        <p id="storySubtitle">齐天大圣大闹天宫的故事</p>
+      </div>
+      <div class="story-content">
+        <div class="story-text" id="storyText">
+          很久很久以前，有一只从石头里蹦出来的猴子，名叫孙悟空。他聪明勇敢，学了一身本领，还得到了金箍棒作为武器。
+          <br><br>
+          玉皇大帝封他做"弼马温"，可是孙悟空觉得自己被大材小用了，一气之下回到花果山，自封"齐天大圣"。
+          <br><br>
+          后来，玉皇大帝请他去看守蟠桃园。王母娘娘开蟠桃盛会，没请孙悟空。悟空一怒之下，吃光了蟠桃，喝光了仙酒，还偷吃了太上老君的仙丹！
+          <br><br>
+          天兵天将来抓他，都打不过他。最后太上老君用八卦炉炼他，反而炼出了火眼金睛。悟空打翻了炼丹炉，大闹天宫，谁都拦不住他！
+        </div>
+
+        <div class="knowledge-card">
+          <h4>📚 知识点</h4>
+          <p><strong>托塔李天王：</strong>天上的神仙，手里的塔叫"玲珑塔"。他有个厉害的乾坤圈，能套住任何东西！</p>
+          <p style="margin-top:10px;"><strong>太上老君：</strong>道教的祖师爷，他的八卦炉能炼出仙丹。孙悟空就是被他的炉子炼出了火眼金睛！</p>
+        </div>
+
+        <button class="play-btn" onclick="playStory()">
+          <span>🔊</span> <span id="playBtnText">听悟空讲故事</span>
+        </button>
+
+        <div class="quiz-section" id="quizSection">
+          <div class="quiz-title">🧠 小测验</div>
+          <div class="quiz-question" id="quizQuestion">问题：孙悟空大闹天宫时，吃了什么好东西？</div>
+          <div class="quiz-options" id="quizOptions">
+            <button class="quiz-option" onclick="answerQuiz(0)">A. 蟠桃和仙丹</button>
+            <button class="quiz-option" onclick="answerQuiz(1)">B. 萝卜和白菜</button>
+            <button class="quiz-option" onclick="answerQuiz(2)">C. 巧克力和蛋糕</button>
+          </div>
+          <div class="quiz-result" id="quizResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 三字经页 ========== -->
+  <div class="page" id="sanjijingPage">
+    <div class="sanjijing-page">
+      <div class="unit-card" id="sanjijingCard">
+        <div class="unit-header">
+          <span class="unit-num">第一单元</span>
+          <div class="unit-stars" id="sanjijingUnitStars">☆☆☆</div>
+        </div>
+        <div class="sanjijing-text" id="sanjijingText"></div>
+        <div class="meaning-box">
+          <h4>📖 含义</h4>
+          <p>人出生的时候，本性都是善良的。后来因为生活环境不同，性情就变坏了。</p>
+        </div>
+        <button class="read-btn" onclick="readSanjijing()">
+          <span>🔊</span> 听朗读
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 声律启蒙页 ========== -->
+  <div class="page" id="shenglvPage">
+    <div class="shenglv-page">
+      <div class="verse-card">
+        <div class="verse-title">声律启蒙 · 一东</div>
+        <div class="verse-line">
+          <span class="verse-word" id="yunWord">云</span>
+          <span style="color:#9B59B6;">对</span>
+          <span class="verse-word" id="yuWord">雨</span>
+        </div>
+        <div class="verse-line">
+          <span class="verse-word" id="xueWord">雪</span>
+          <span style="color:#9B59B6;">对</span>
+          <span class="verse-word" id="fengWord">风</span>
+        </div>
+        <div class="verse-line">
+          <span class="verse-word" id="wanZhao">晚照</span>
+          <span style="color:#9B59B6;">对</span>
+          <span class="verse-word" id="qingKong">晴空</span>
+        </div>
+        <div class="verse-actions">
+          <button class="verse-btn play" onclick="readVerse()">🔊 听朗读</button>
+          <button class="verse-btn match" onclick="startMatch()">🎮 对对碰</button>
+        </div>
+        <div class="meaning-box" style="margin-top:15px;">
+          <h4>📖 含义</h4>
+          <p>云和雨是一对，雪和风是一对，傍晚的阳光对应晴朗的天空。这叫对仗，词语要成双成对。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 游戏页 ========== -->
+  <div class="page" id="gamePage">
+    <div class="game-page">
+      <div class="game-grid">
+        <div class="game-card" onclick="startMatch()">
+          <div class="game-icon">🎴</div>
+          <div class="game-name">对对碰</div>
+          <div class="game-desc">词语配对</div>
+        </div>
+        <div class="game-card" onclick="showComingSoon()">
+          <div class="game-icon">🧩</div>
+          <div class="game-name">消消乐</div>
+          <div class="game-desc">即将推出</div>
+        </div>
+        <div class="game-card" onclick="showComingSoon()">
+          <div class="game-icon">🎨</div>
+          <div class="game-name">贴贴乐</div>
+          <div class="game-desc">即将推出</div>
+        </div>
+        <div class="game-card" onclick="showComingSoon()">
+          <div class="game-icon">🏆</div>
+          <div class="game-name">排行榜</div>
+          <div class="game-desc">即将推出</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 对对碰游戏 ========== -->
+  <div class="page" id="matchPage">
+    <div class="match-game">
+      <div style="text-align:center;margin-bottom:10px;">
+        <h3 style="color:#2D3436;">🎴 对对碰 · 声律启蒙</h3>
+        <p style="color:#666;font-size:14px;">把词语拖到对应的位置</p>
+      </div>
+      <div class="match-score">得分: <span id="matchScore">0</span></div>
+      <div class="match-grid" id="matchGrid"></div>
+      <div class="match-hint">点击词语，再点击对应位置</div>
+    </div>
+  </div>
+
+  <script>
+    // ========== 状态管理 ==========
+    let state = {
+      totalStars: 0,
+      storyStars: 0,
+      sanjijingStars: 0,
+      shenglvStars: 0,
+      gameStars: 0,
+      storyQuizDone: false,
+      sanjijingUnitDone: false,
+      shenglvDone: false,
+      matchScore: 0
+    };
+
+    // 从 LocalStorage 加载
+    function loadState() {
+      const saved = localStorage.getItem('xiyouji_kids_state');
+      if (saved) {
+        state = { ...state, ...JSON.parse(saved) };
+      }
+      updateUI();
+    }
+
+    function saveState() {
+      localStorage.setItem('xiyouji_kids_state', JSON.stringify(state));
+    }
+
+    function updateUI() {
+      // 更新星星数
+      document.getElementById('starCount').textContent = state.totalStars;
+
+      // 更新各区域星星显示
+      updateStarsDisplay('story', state.storyStars);
+      updateStarsDisplay('sanjijing', state.sanjijingStars);
+      updateStarsDisplay('shenglv', state.shenglvStars);
+      updateStarsDisplay('game', state.gameStars);
+
+      // 三字经文本
+      renderSanjijing();
+    }
+
+    function updateStarsDisplay(key, count) {
+      const el = document.getElementById(key + 'Stars');
+      if (el) {
+        el.textContent = '★'.repeat(count) + '☆'.repeat(3 - count);
+      }
+    }
+
+    // ========== 页面导航 ==========
+    let currentPage = 'home';
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      currentPage = pageId;
+
+      const topBar = document.getElementById('topBar');
+      if (pageId === 'homePage') {
+        topBar.style.display = 'none';
+      } else {
+        topBar.style.display = 'flex';
+      }
+    }
+
+    function goBack() {
+      if (currentPage === 'matchPage') {
+        showPage('gamePage');
+        document.getElementById('topTitle').textContent = '游戏乐园';
+      } else if (currentPage === 'gamePage') {
+        showPage('homePage');
+      } else {
+        showPage('homePage');
+      }
+    }
+
+    function openStory() {
+      showPage('storyPage');
+      document.getElementById('topTitle').textContent = '悟空学苑';
+    }
+
+    function openSanjijing() {
+      showPage('sanjijingPage');
+      document.getElementById('topTitle').textContent = '三字经课堂';
+      renderSanjijing();
+    }
+
+    function openShenglv() {
+      showPage('shenglvPage');
+      document.getElementById('topTitle').textContent = '声律启蒙馆';
+    }
+
+    function openGames() {
+      showPage('gamePage');
+      document.getElementById('topTitle').textContent = '游戏乐园';
+    }
+
+    // ========== Toast ==========
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ========== 星星动画 ==========
+    function addStar(x, y) {
+      state.totalStars++;
+      saveState();
+      document.getElementById('starCount').textContent = state.totalStars;
+
+      const star = document.createElement('div');
+      star.className = 'star-burst';
+      star.textContent = '⭐';
+      star.style.left = x + 'px';
+      star.style.top = y + 'px';
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 1000);
+    }
+
+    // ========== TTS ==========
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'zh-CN';
+        utt.rate = 0.9;
+        utt.pitch = 1.1;
+        // 尝试找中文语音
+        const voices = window.speechSynthesis.getVoices();
+        const zhVoice = voices.find(v => v.lang.includes('zh'));
+        if (zhVoice) utt.voice = zhVoice;
+        window.speechSynthesis.speak(utt);
+      } else {
+        showToast('您的浏览器不支持语音朗读');
+      }
+    }
+
+    function playStory() {
+      const text = document.getElementById('storyText').textContent;
+      speak(text);
+      document.getElementById('playBtnText').textContent = '🔊 播放中...';
+      setTimeout(() => {
+        document.getElementById('playBtnText').textContent = '🔊 听悟空讲故事';
+      }, text.length * 150);
+    }
+
+    function readSanjijing() {
+      const text = document.getElementById('sanjijingText').textContent.replace(/\s/g, '');
+      speak(text);
+
+      // 高亮逐字
+      const chars = document.querySelectorAll('.sanjijing-char');
+      let i = 0;
+      chars.forEach(c => c.classList.remove('highlight'));
+      const interval = setInterval(() => {
+        if (i < chars.length) {
+          chars[i].classList.add('highlight');
+          i++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 300);
+    }
+
+    function readVerse() {
+      const verse = '云对雨，雪对风，晚照对晴空';
+      speak(verse);
+
+      ['yunWord', 'yuWord', 'xueWord', 'fengWord', 'wanZhao', 'qingKong'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+      });
+
+      const order = ['yunWord', 'yuWord', 'xueWord', 'fengWord', 'wanZhao', 'qingKong'];
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < order.length) {
+          document.getElementById(order[i]).classList.add('active');
+          i++;
+        } else {
+          setTimeout(() => {
+            order.forEach(id => document.getElementById(id).classList.remove('active'));
+          }, 500);
+          clearInterval(interval);
+        }
+      }, 600);
+    }
+
+    // ========== 三字经渲染 ==========
+    function renderSanjijing() {
+      const text = '人之初，性本善，性相近，习相远';
+      const container = document.getElementById('sanjijingText');
+      if (!container) return;
+
+      container.innerHTML = '';
+      for (let i = 0; i < text.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'sanjijing-char';
+        span.textContent = text[i];
+        if (text[i] === '，' || text[i] === '。') {
+          span.innerHTML = text[i];
+        }
+        container.appendChild(span);
+      }
+    }
+
+    // ========== 测验 ==========
+    const quizOptions = document.querySelectorAll('.quiz-option');
+    let answered = false;
+
+    function answerQuiz(idx) {
+      if (answered || state.storyQuizDone) return;
+      answered = true;
+
+      const correct = idx === 0;
+      quizOptions[idx].classList.add(correct ? 'correct' : 'wrong');
+
+      if (!correct) {
+        quizOptions[0].classList.add('correct');
+      }
+
+      const result = document.getElementById('quizResult');
+      if (correct) {
+        result.textContent = '🎉 太棒了！答对啦！';
+        result.className = 'quiz-result success';
+        state.storyQuizDone = true;
+        state.storyStars = 3;
+        state.totalStars += 3;
+        saveState();
+        updateUI();
+        setTimeout(() => addStar(200, 300), 300);
+        setTimeout(() => addStar(250, 320), 500);
+        setTimeout(() => addStar(220, 280), 700);
+        showToast('🎉 获得3颗星星！');
+      } else {
+        result.textContent = '🤔 再想想，下次答对哦！';
+        result.className = 'quiz-result fail';
+      }
+      result.style.display = 'block';
+    }
+
+    // ========== 对对碰游戏 ==========
+    let matchSelected = null;
+    let matchCount = 0;
+    const matchPairs = [
+      { left: '云', right: '雨' },
+      { left: '雪', right: '风' },
+      { left: '晚照', right: '晴空' }
+    ];
+
+    function startMatch() {
+      showPage('matchPage');
+      document.getElementById('topTitle').textContent = '对对碰';
+      matchSelected = null;
+      matchCount = 0;
+      document.getElementById('matchScore').textContent = '0';
+
+      const grid = document.getElementById('matchGrid');
+      grid.innerHTML = '';
+
+      // 左边（可点击）
+      matchPairs.forEach(pair => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+        card.textContent = pair.left;
+        card.dataset.side = 'left';
+        card.dataset.value = pair.left;
+        card.onclick = () => selectMatchCard(card);
+        grid.appendChild(card);
+      });
+
+      // 右边（目标位置）
+      const rightPairs = [...matchPairs].sort(() => Math.random() - 0.5);
+      rightPairs.forEach(pair => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+        card.textContent = '?';
+        card.dataset.side = 'right';
+        card.dataset.value = pair.right;
+        card.dataset.matchWith = pair.left;
+        card.onclick = () => selectMatchCard(card);
+        grid.appendChild(card);
+      });
+    }
+
+    function selectMatchCard(card) {
+      if (card.classList.contains('matched')) return;
+
+      // 左边选择
+      if (card.dataset.side === 'left') {
+        document.querySelectorAll('.match-card').forEach(c => {
+          if (c.dataset.side === 'left') c.classList.remove('flipped');
+        });
+        card.classList.add('flipped');
+        matchSelected = card;
+      }
+      // 右边放置
+      else if (card.dataset.side === 'right' && matchSelected) {
+        if (card.dataset.value === matchSelected.dataset.matchWith) {
+          card.textContent = card.dataset.value;
+          card.classList.add('matched');
+          matchSelected.classList.add('matched');
+          matchSelected.textContent = matchSelected.dataset.value;
+          matchCount++;
+          state.matchScore++;
+          document.getElementById('matchScore').textContent = state.matchScore;
+
+          if (matchCount === 3) {
+            showToast('🎉 太厉害了！全部答对！');
+            if (!state.shenglvDone) {
+              state.shenglvDone = true;
+              state.shenglvStars = 3;
+              state.totalStars += 3;
+              saveState();
+              updateUI();
+              setTimeout(() => addStar(200, 300), 300);
+            }
+          }
+          matchSelected = null;
+        } else {
+          card.style.animation = 'none';
+          setTimeout(() => {
+            card.style.animation = '';
+          }, 10);
+          showToast('不对哦，再试试！');
+        }
+      }
+    }
+
+    function showComingSoon() {
+      showToast('即将推出，敬请期待！🎉');
+    }
+
+    // ========== 初始化 ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderSanjijing();
+    });
+  </script>
+</body>
+</html>
