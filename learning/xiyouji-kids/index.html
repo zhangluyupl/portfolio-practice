@@ -1171,10 +1171,13 @@
             }, 600);
           }
         } else {
-          // 答对但还有下一题：立即显示下一题
+          // 答对但还有下一题：显示反馈，1200ms后再显示下一题
           quizIdx++;
-          quizAnswered = false;
-          renderQuiz();
+          document.getElementById('retryBtn').classList.add('show');
+          setTimeout(() => {
+            quizAnswered = false;
+            renderQuiz();
+          }, 1200);
         }
       } else {
         result.textContent = `🤔 不对哦，正确答案是${'ABC'[correct]}！`; result.className = 'quiz-result fail';
