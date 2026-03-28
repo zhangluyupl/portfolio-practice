@@ -2,514 +2,494 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>西游记·萌娃学文化</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    /* ===== 全局 ===== */
     :root {
       --primary: #FF6B35;
       --secondary: #4ECDC4;
       --gold: #FFD93D;
       --dark: #2D3436;
       --light: #FFF8E7;
-      --pink: #FF8FAB;
       --purple: #9B59B6;
-      --sky: #74B9FF;
       --green: #00B894;
       --red: #FF6B6B;
-      --orange: #FDCB6E;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       background: var(--light);
       min-height: 100vh;
+      min-height: 100dvh; /* iOS Safari dynamic viewport */
       overflow-x: hidden;
       user-select: none;
+      padding-bottom: var(--safe-bottom);
     }
+    /* iOS Safari 100vh fix */
+    .page { min-height: 100vh; min-height: 100dvh; }
+
+    /* ===== 动画 ===== */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bounceIn { 0%{transform:scale(0.3);opacity:0} 50%{transform:scale(1.08)} 70%{transform:scale(0.95)} 100%{transform:scale(1);opacity:1} }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    @keyframes cloudDrift { 0%{transform:translateX(0)} 50%{transform:translateX(15px)} 100%{transform:translateX(0)} }
+    @keyframes starSpin { 0%{transform:rotate(0deg) scale(1)} 50%{transform:rotate(180deg) scale(1.3)} 100%{transform:rotate(360deg) scale(1)} }
+    @keyframes charPop { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes slideUp { 0%{transform:translateY(100%);opacity:0} 100%{transform:translateY(0);opacity:1} }
+    @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+    @keyframes sunGlow { 0%,100%{box-shadow:0 0 40px rgba(255,217,61,0.5)} 50%{box-shadow:0 0 70px rgba(255,217,61,0.9)} }
+    @keyframes starFlyUp { 0%{opacity:1;transform:scale(1) translateY(0)} 100%{opacity:0;transform:scale(1.5) translateY(-80px)} }
 
     /* ===== 顶部栏 ===== */
     .top-bar {
       position: fixed; top: 0; left: 0; right: 0;
-      height: 70px;
+      height: calc(60px + env(safe-area-inset-top, 0px));
+      padding-top: env(safe-area-inset-top, 0px);
       background: linear-gradient(135deg, #FF6B35, #FF8E53);
-      display: flex; align-items: center; padding: 0 20px;
-      z-index: 100;
-      box-shadow: 0 4px 20px rgba(255,107,53,0.35);
+      display: flex; align-items: center; padding-left: 16px; padding-right: 16px;
+      z-index: 100; box-shadow: 0 4px 20px rgba(255,107,53,0.35);
     }
     .top-bar .stars {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 22px; color: white; font-weight: bold;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 20px; color: white; font-weight: bold; min-width: 60px;
     }
-    .top-bar .stars .star-icon { font-size: 32px; }
-    .top-title {
-      flex: 1; text-align: center;
-      color: white; font-size: 20px; font-weight: bold;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
-    }
+    .top-bar .stars .star-icon { font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+    .top-title { flex: 1; text-align: center; color: white; font-size: 18px; font-weight: bold; }
     .top-back {
-      width: 50px; height: 50px; border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: rgba(255,255,255,0.25); border: none;
-      color: white; font-size: 24px; cursor: pointer;
+      color: white; font-size: 22px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-    }
-    .top-back:active { background: rgba(255,255,255,0.4); }
-
-    /* ===== 页面 ===== */
-    .page { display: none; min-height: 100vh; padding-top: 70px; }
-    .page.active { display: block; animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes bounceIn {
-      0% { transform: scale(0.3); opacity: 0; }
-      50% { transform: scale(1.1); }
-      70% { transform: scale(0.9); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    @keyframes starSpin {
-      0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(180deg) scale(1.3); }
-      100% { transform: rotate(360deg) scale(1); }
+      flex-shrink: 0;
     }
 
-    /* ===== 首页 ===== */
+    /* ===== 页面容器 ===== */
+    .page { display: none; padding-top: 60px; }
+    .page.active { display: block; animation: fadeIn 0.35s ease; }
+    .page.padding-top { padding-top: calc(60px + env(safe-area-inset-top, 0px)); }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed; top: 85px; left: 50%;
+      transform: translateX(-50%) translateY(-15px);
+      background: rgba(0,0,0,0.82); color: white;
+      padding: 12px 26px; border-radius: 30px;
+      font-size: 15px; z-index: 300;
+      opacity: 0; transition: all 0.3s ease; pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== 庆祝 ===== */
+    .celebration { position: fixed; inset: 0; pointer-events: none; z-index: 998; display: none; }
+    .celebration.show { display: block; }
+    .confetti { position: absolute; font-size: 28px; animation: confettiFall 2.2s ease-out forwards; }
+
+    /* ===== 星星飞升 ===== */
+    .star-fly { position: fixed; pointer-events: none; z-index: 400; font-size: 34px; animation: starFlyUp 0.9s ease-out forwards; }
+
+    /* ===== 徽章弹窗 ===== */
+    .badge-popup {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none; align-items: center; justify-content: center;
+      z-index: 500; backdrop-filter: blur(4px);
+    }
+    .badge-popup.show { display: flex; animation: fadeIn 0.3s ease; }
+    .badge-content {
+      background: white; border-radius: 32px; padding: 40px 30px;
+      text-align: center; max-width: 320px; width: 85%;
+      animation: bounceIn 0.5s ease; margin: 20px;
+    }
+    .badge-icon { font-size: 80px; margin-bottom: 16px; }
+    .badge-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .badge-desc { font-size: 15px; color: #666; line-height: 1.7; margin-bottom: 24px; }
+    .badge-close {
+      display: inline-block; padding: 14px 40px; border-radius: 30px; border: none;
+      background: linear-gradient(135deg, #FF6B35, #FF8E53);
+      color: white; font-size: 16px; font-weight: bold; cursor: pointer;
+    }
+    .badge-close:active { opacity: 0.85; transform: scale(0.97); }
+
+    /* ===== ====== 首页 ===== ====== */
     .home-page {
       background: linear-gradient(180deg, #FFF8E7 0%, #FFE4C4 100%);
-      padding: 30px 20px 60px;
-      min-height: 100vh;
-    }
-    .home-bg {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none; overflow: hidden; z-index: 0;
-    }
-    .cloud {
-      position: absolute; font-size: 60px; opacity: 0.3;
-      animation: float 4s ease-in-out infinite;
-    }
-    .welcome-text { text-align: center; margin-bottom: 25px; position: relative; z-index: 1; }
-    .welcome-text h1 {
-      font-size: 32px; color: #FF6B35; margin-bottom: 8px;
-      text-shadow: 2px 2px 0 rgba(255,107,53,0.1);
-    }
-    .welcome-text p { font-size: 16px; color: #999; }
-
-    .map-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 20px; max-width: 600px; margin: 0 auto;
-      position: relative; z-index: 1;
-    }
-    .map-door {
-      background: white; border-radius: 28px;
-      padding: 30px 20px; text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      cursor: pointer; transition: all 0.25s ease;
+      min-height: 100vh; min-height: 100dvh;
+      padding: 24px 16px 40px;
       position: relative; overflow: hidden;
     }
-    .map-door:active { transform: scale(0.95); }
-    .map-door::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    /* 云朵装饰 */
+    .clouds { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .cloud { position: absolute; opacity: 0.25; font-size: 50px; animation: cloudDrift 6s ease-in-out infinite; }
+    .cloud:nth-child(1){top:8%;left:2%;animation-duration:7s;}
+    .cloud:nth-child(2){top:20%;right:4%;animation-duration:9s;animation-delay:1s;}
+    .cloud:nth-child(3){top:50%;left:1%;animation-duration:8s;animation-delay:2s;}
+    .cloud:nth-child(4){top:65%;right:3%;animation-duration:6s;animation-delay:0.5s;}
+    .cloud:nth-child(5){top:85%;left:5%;animation-duration:10s;animation-delay:3s;}
+
+    .home-content { position: relative; z-index: 1; }
+    .welcome { text-align: center; margin-bottom: 28px; padding-top: 10px; }
+    .welcome h1 { font-size: 30px; color: #FF6B35; margin-bottom: 6px; text-shadow: 2px 2px 0 rgba(255,107,53,0.1); }
+    .welcome p { font-size: 14px; color: #aaa; }
+
+    /* 连续打卡 */
+    .streak-bar {
+      background: white; border-radius: 16px; padding: 14px 20px;
+      margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
     }
-    .map-door.story::before { background: linear-gradient(90deg, #FF6B35, #FF8E53); }
-    .map-door.sanjijing::before { background: linear-gradient(90deg, #4ECDC4, #44A08D); }
-    .map-door.shenglv::before { background: linear-gradient(90deg, #9B59B6, #8E44AD); }
-    .map-door.game::before { background: linear-gradient(90deg, #FFD93D, #F39C12); }
+    .streak-left { display: flex; align-items: center; gap: 10px; }
+    .streak-fire { font-size: 28px; }
+    .streak-info .streak-days { font-size: 20px; font-weight: bold; color: #FF6B35; }
+    .streak-info .streak-label { font-size: 12px; color: #999; }
+    .streak-dots { display: flex; gap: 6px; align-items: center; }
+    .streak-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #eee; display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .streak-dot.done { background: #FFD93D; }
+    .streak-dot.today { background: #FF6B35; color: white; }
 
-    .door-icon { font-size: 60px; margin-bottom: 12px; }
-    .door-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 6px; }
-    .door-desc { font-size: 13px; color: #999; }
-    .door-stars { display: flex; justify-content: center; gap: 3px; margin-top: 12px; font-size: 22px; }
+    /* 地图网格 */
+    .map-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; max-width: 560px; margin: 0 auto;
+    }
+    .map-door {
+      background: white; border-radius: 24px;
+      padding: 24px 16px; text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.09);
+      cursor: pointer; transition: transform 0.2s ease;
+      position: relative; overflow: hidden;
+    }
+    .map-door:active { transform: scale(0.96); }
+    .map-door::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; }
+    .map-door.story::before { background: linear-gradient(90deg,#FF6B35,#FF8E53); }
+    .map-door.sanjijing::before { background: linear-gradient(90deg,#4ECDC4,#44A08D); }
+    .map-door.shenglv::before { background: linear-gradient(90deg,#9B59B6,#8E44AD); }
+    .map-door.game::before { background: linear-gradient(90deg,#FFD93D,#F39C12); }
+    .door-icon { font-size: 54px; margin-bottom: 10px; }
+    .door-title { font-size: 17px; font-weight: bold; color: #333; margin-bottom: 4px; }
+    .door-desc { font-size: 12px; color: #999; }
+    .door-stars { display: flex; justify-content: center; gap: 2px; margin-top: 10px; font-size: 20px; }
 
-    /* ===== 故事页 ===== */
+    .home-footer {
+      text-align: center; margin-top: 28px;
+      font-size: 13px; color: #ccc;
+    }
+    .home-footer span { color: #FFD93D; font-weight: bold; }
+
+    /* ===== ====== 故事页 ===== ====== */
     .story-page {
       background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-      min-height: 100vh; color: white;
+      color: white; min-height: 100vh; min-height: 100dvh;
     }
-    .story-hero { text-align: center; padding: 35px 25px; }
-    .story-palace {
-      width: 140px; height: 140px; margin: 0 auto 25px;
-      background: linear-gradient(135deg, #FFD93D, #FF8E53);
+    .story-hero { text-align: center; padding: 30px 24px 20px; }
+    .story-sun {
+      width: 130px; height: 130px; margin: 0 auto 20px;
+      background: radial-gradient(circle, #FFD93D, #FF8E53);
       border-radius: 30px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 70px;
-      box-shadow: 0 0 50px rgba(255,217,61,0.4);
-      animation: float 3s ease-in-out infinite;
+      font-size: 65px; animation: float 3s ease-in-out infinite, sunGlow 3s ease-in-out infinite;
     }
-    .story-hero h2 { font-size: 30px; margin-bottom: 10px; }
-    .story-hero p { font-size: 15px; color: rgba(255,255,255,0.7); }
-    .story-progress {
-      display: flex; justify-content: center; gap: 8px; margin-top: 15px;
+    .story-hero h2 { font-size: 28px; margin-bottom: 8px; }
+    .story-hero p { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+
+    /* 故事进度点 */
+    .story-dots { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+    .story-dot {
+      width: 32px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25);
+      transition: all 0.3s ease; cursor: pointer;
     }
-    .progress-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-    }
-    .progress-dot.active { background: #FFD93D; }
+    .story-dot.active { background: #FFD93D; width: 48px; }
+    .story-dot.done { background: rgba(255,217,61,0.5); }
 
     .story-content {
       background: rgba(255,255,255,0.05);
-      border-radius: 30px 30px 0 0;
-      padding: 25px;
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
     }
     .story-text {
-      font-size: 18px; line-height: 2; color: rgba(255,255,255,0.92);
-      margin-bottom: 20px;
+      font-size: 17px; line-height: 2; color: rgba(255,255,255,0.92);
     }
+    .story-text p { margin-bottom: 14px; }
+    .story-text p:last-child { margin-bottom: 0; }
+
     .knowledge-card {
-      background: linear-gradient(135deg, rgba(78,205,196,0.25), rgba(78,205,196,0.1));
-      border: 2px solid rgba(78,205,196,0.5);
-      border-radius: 20px; padding: 22px; margin: 20px 0;
+      background: linear-gradient(135deg, rgba(78,205,196,0.22), rgba(78,205,196,0.08));
+      border: 2px solid rgba(78,205,196,0.45);
+      border-radius: 18px; padding: 20px; margin: 18px 0;
     }
-    .knowledge-card h4 {
-      color: #4ECDC4; font-size: 16px; margin-bottom: 12px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .knowledge-card p { font-size: 15px; color: rgba(255,255,255,0.88); line-height: 1.8; }
+    .knowledge-card h4 { color: #4ECDC4; font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .knowledge-card p { font-size: 14px; color: rgba(255,255,255,0.88); line-height: 1.8; }
     .knowledge-card p + p { margin-top: 8px; }
 
     .play-btn {
       width: 100%; padding: 20px; border-radius: 18px; border: none;
       background: linear-gradient(135deg, #FF6B35, #FF8E53);
-      color: white; font-size: 19px; font-weight: bold;
+      color: white; font-size: 18px; font-weight: bold;
       cursor: pointer; display: flex; align-items: center;
       justify-content: center; gap: 12px;
-      margin: 20px 0; box-shadow: 0 8px 25px rgba(255,107,53,0.4);
+      margin: 18px 0; box-shadow: 0 8px 25px rgba(255,107,53,0.35);
     }
     .play-btn:active { transform: scale(0.98); }
     .play-btn.playing { background: linear-gradient(135deg, #FF8E53, #FF6B35); }
 
+    /* 测验区 */
     .quiz-section {
       background: rgba(255,255,255,0.05); border-radius: 20px;
-      padding: 22px; margin-top: 20px;
+      padding: 22px; margin-top: 18px;
     }
-    .quiz-title {
-      font-size: 18px; color: #FFD93D; margin-bottom: 18px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .quiz-question { font-size: 17px; margin-bottom: 18px; color: white; }
-    .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+    .quiz-title { font-size: 17px; color: #FFD93D; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .quiz-question { font-size: 16px; margin-bottom: 16px; color: white; line-height: 1.6; }
+    .quiz-options { display: flex; flex-direction: column; gap: 11px; }
     .quiz-option {
-      padding: 18px 22px; border-radius: 14px;
-      border: 3px solid rgba(255,255,255,0.2);
+      padding: 18px 20px; border-radius: 14px;
+      border: 3px solid rgba(255,255,255,0.18);
       background: rgba(255,255,255,0.06);
-      color: white; font-size: 16px; text-align: left;
+      color: white; font-size: 15px; text-align: left;
       cursor: pointer; transition: all 0.2s ease;
     }
     .quiz-option:active { transform: scale(0.98); }
-    .quiz-option.correct { border-color: #00B894; background: rgba(0,184,148,0.25); }
-    .quiz-option.wrong { border-color: #FF6B6B; background: rgba(255,107,107,0.2); }
-    .quiz-option.faded { opacity: 0.4; }
+    .quiz-option.correct { border-color: #00B894; background: rgba(0,184,148,0.22); }
+    .quiz-option.wrong { border-color: #FF6B6B; background: rgba(255,107,107,0.18); }
+    .quiz-option.faded { opacity: 0.35; }
 
-    .quiz-result {
-      text-align: center; padding: 25px; font-size: 20px; display: none;
-    }
+    .quiz-result { text-align: center; padding: 22px; font-size: 18px; display: none; margin-top: 12px; }
     .quiz-result.success { color: #00B894; }
     .quiz-result.fail { color: #FF6B6B; }
 
+    .quiz-footer { display: flex; gap: 12px; margin-top: 14px; }
+    .retry-btn {
+      flex: 1; padding: 16px; border-radius: 14px; border: none;
+      background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+      font-size: 15px; cursor: pointer; display: none;
+    }
+    .retry-btn.show { display: block; }
     .next-btn {
-      width: 100%; padding: 18px; border-radius: 16px; border: none;
+      flex: 1; padding: 16px; border-radius: 14px; border: none;
       background: linear-gradient(135deg, #00B894, #00CEC9);
-      color: white; font-size: 17px; font-weight: bold;
-      cursor: pointer; display: none; align-items: center;
-      justify-content: center; gap: 8px; margin-top: 15px;
+      color: white; font-size: 15px; font-weight: bold; cursor: pointer;
+      display: none;
     }
-    .next-btn.show { display: flex; }
+    .next-btn.show { display: block; }
 
-    /* ===== 三字经页 ===== */
-    .sanjijing-page { background: linear-gradient(180deg, #E8F6F3 0%, #D5E8E4 100%); min-height: 100vh; padding: 20px; }
-    .unit-nav {
+    /* 重置按钮 */
+    .reset-area { text-align: center; margin-top: 16px; }
+    .reset-btn {
+      font-size: 13px; color: rgba(255,255,255,0.4);
+      background: none; border: none; cursor: pointer; text-decoration: underline;
+    }
+
+    /* ===== ====== 三字经页 ===== ====== */
+    .sanjijing-page { background: linear-gradient(180deg, #E8F6F3 0%, #D5E8E4 100%); min-height: 100vh; min-height: 100dvh; padding: 16px; }
+
+    /* 单元导航 */
+    .sj-unit-nav {
       display: flex; gap: 8px; flex-wrap: wrap;
-      margin-bottom: 20px; padding: 15px;
-      background: white; border-radius: 16px;
+      margin-bottom: 16px; background: white;
+      border-radius: 16px; padding: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
-    .unit-tab {
-      padding: 8px 16px; border-radius: 20px; border: 2px solid #4ECDC4;
-      background: transparent; color: #4ECDC4;
-      font-size: 14px; cursor: pointer; transition: all 0.2s ease;
+    .sj-unit-tab {
+      padding: 8px 14px; border-radius: 20px;
+      border: 2px solid #4ECDC4; background: transparent;
+      color: #4ECDC4; font-size: 13px; cursor: pointer; transition: all 0.2s ease;
     }
-    .unit-tab.active { background: #4ECDC4; color: white; }
-    .unit-tab.locked { opacity: 0.4; border-color: #ccc; color: #999; }
+    .sj-unit-tab.active { background: #4ECDC4; color: white; }
+    .sj-unit-tab.done { background: rgba(78,205,196,0.15); border-color: #00B894; color: #00B894; }
+    .sj-unit-tab.done.active { background: #00B894; color: white; }
 
-    .sanjijing-unit {
-      background: white; border-radius: 24px; padding: 25px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    /* 三字经卡片 */
+    .sj-card {
+      background: white; border-radius: 24px; padding: 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.07);
     }
-    .sanjijing-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .sanjijing-unit-title {
+    .sj-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .sj-unit-badge {
       background: linear-gradient(135deg, #4ECDC4, #44A08D);
-      color: white; padding: 8px 16px; border-radius: 20px;
-      font-size: 14px; font-weight: bold;
+      color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold;
     }
-    .sanjijing-unit-stars { font-size: 20px; }
-    .sanjijing-text {
-      font-size: 26px; line-height: 2.2; color: #2D3436;
-      text-align: center; margin: 20px 0;
-      letter-spacing: 4px;
+    .sj-unit-stars { font-size: 20px; }
+    .sj-text {
+      font-size: 24px; line-height: 2.2; color: #2D3436;
+      text-align: center; margin: 16px 0; letter-spacing: 4px;
     }
-    .char-highlight {
-      display: inline-block; padding: 2px 0;
-      transition: all 0.3s ease;
-    }
-    .char-highlight.current {
-      color: #FF6B35;
-      animation: charPop 0.3s ease;
-    }
-    @keyframes charPop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.4); }
-      100% { transform: scale(1); }
-    }
+    .sj-char { display: inline-block; padding: 0 1px; transition: color 0.2s; }
+    .sj-char.current { color: #FF6B35; animation: charPop 0.3s ease; }
+    .sj-punct { display: inline-block; }
 
-    .meaning-box {
+    .sj-meaning {
       background: #FFF8E7; border-radius: 14px;
-      padding: 18px; margin: 18px 0;
-      border-left: 5px solid #FFD93D;
+      padding: 16px; margin: 16px 0; border-left: 5px solid #FFD93D;
     }
-    .meaning-box h4 { font-size: 15px; color: #FF6B35; margin-bottom: 10px; }
-    .meaning-box p { font-size: 15px; color: #666; line-height: 1.8; }
+    .sj-meaning h4 { font-size: 14px; color: #FF6B35; margin-bottom: 8px; }
+    .sj-meaning p { font-size: 14px; color: #666; line-height: 1.75; }
 
-    .sanjijing-actions { display: flex; gap: 12px; }
-    .read-btn {
-      flex: 1; padding: 16px; border-radius: 14px; border: none;
-      background: linear-gradient(135deg, #4ECDC4, #44A08D);
-      color: white; font-size: 16px; font-weight: bold;
-      cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 8px;
+    .sj-actions { display: flex; gap: 10px; }
+    .sj-btn {
+      flex: 1; padding: 15px; border-radius: 14px; border: none;
+      color: white; font-size: 15px; font-weight: bold;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .test-btn {
-      flex: 1; padding: 16px; border-radius: 14px; border: none;
-      background: linear-gradient(135deg, #FF6B35, #FF8E53);
-      color: white; font-size: 16px; font-weight: bold;
-      cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 8px;
-    }
+    .sj-btn.read { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+    .sj-btn.test { background: linear-gradient(135deg, #FF6B35, #FF8E53); }
 
-    .quiz-card {
-      background: rgba(78,205,196,0.1); border-radius: 16px;
-      padding: 20px; margin-top: 20px; display: none;
+    /* 三字经测验 */
+    .sj-quiz {
+      background: rgba(78,205,196,0.08); border-radius: 16px;
+      padding: 18px; margin-top: 16px; display: none;
     }
-    .quiz-card.show { display: block; }
-    .quiz-card h4 { color: #4ECDC4; font-size: 16px; margin-bottom: 15px; }
-    .quiz-card .quiz-question { font-size: 16px; color: #333; margin-bottom: 12px; }
-    .quiz-card .quiz-option {
-      padding: 14px 18px; border-radius: 12px;
-      border: 2px solid rgba(78,205,196,0.4);
-      background: white; color: #333; font-size: 15px;
-      text-align: left; cursor: pointer; width: 100%;
+    .sj-quiz.show { display: block; }
+    .sj-quiz h4 { color: #4ECDC4; font-size: 15px; margin-bottom: 12px; }
+    .sj-quiz-q { font-size: 15px; color: #333; margin-bottom: 12px; line-height: 1.6; }
+    .sj-quiz-opt {
+      display: block; width: 100%; padding: 13px 16px; border-radius: 12px;
+      border: 2px solid rgba(78,205,196,0.4); background: white;
+      color: #333; font-size: 14px; text-align: left; cursor: pointer;
       margin-bottom: 8px;
     }
-    .quiz-card .quiz-option.correct { border-color: #00B894; background: rgba(0,184,148,0.15); color: #00B894; }
-    .quiz-card .quiz-option.wrong { border-color: #FF6B6B; background: rgba(255,107,107,0.1); color: #FF6B6B; }
+    .sj-quiz-opt.correct { border-color: #00B894; background: rgba(0,184,148,0.12); color: #00B894; }
+    .sj-quiz-opt.wrong { border-color: #FF6B6B; background: rgba(255,107,107,0.1); color: #FF6B6B; }
 
-    /* ===== 声律启蒙页 ===== */
-    .shenglv-page { background: linear-gradient(180deg, #F5EEF8 0%, #E8DAEF 100%); min-height: 100vh; padding: 20px; }
-    .verse-card {
-      background: white; border-radius: 24px; padding: 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    /* ===== ====== 声律启蒙页 ===== ====== */
+    .shenglv-page { background: linear-gradient(180deg, #F5EEF8 0%, #E8DAEF 100%); min-height: 100vh; min-height: 100dvh; padding: 16px; }
+
+    .sl-card {
+      background: white; border-radius: 24px; padding: 26px;
+      margin-bottom: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.07);
     }
-    .verse-header { text-align: center; margin-bottom: 25px; }
-    .verse-header h3 { font-size: 22px; color: #9B59B6; margin-bottom: 5px; }
-    .verse-header p { font-size: 14px; color: #999; }
+    .sl-header { text-align: center; margin-bottom: 22px; }
+    .sl-header h3 { font-size: 22px; color: #9B59B6; margin-bottom: 4px; }
+    .sl-header p { font-size: 13px; color: #aaa; }
 
-    .verse-display {
+    .sl-display {
       background: linear-gradient(135deg, #F5EEF8, #E8DAEF);
-      border-radius: 20px; padding: 25px;
-      margin-bottom: 20px;
+      border-radius: 20px; padding: 22px; margin-bottom: 18px;
     }
-    .verse-line {
-      display: flex; align-items: center; justify-content: center;
-      gap: 15px; margin: 18px 0; font-size: 28px;
+    .sl-line { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0; font-size: 26px; }
+    .sl-item {
+      padding: 7px 18px; border-radius: 12px; background: white;
+      color: #9B59B6; font-weight: bold; transition: all 0.3s ease;
     }
-    .verse-item {
-      padding: 8px 20px; border-radius: 12px;
-      background: white; color: #9B59B6; font-weight: bold;
-      transition: all 0.3s ease;
-    }
-    .verse-item.active { background: #9B59B6; color: white; transform: scale(1.1); }
-    .verse-sep { color: #9B59B6; font-size: 24px; }
+    .sl-item.active { background: #9B59B6; color: white; transform: scale(1.08); }
+    .sl-sep { color: #9B59B6; font-size: 22px; }
 
-    .verse-meaning {
+    .sl-meaning {
       background: #F5EEF8; border-radius: 14px;
-      padding: 15px; margin-top: 15px;
-      border-left: 4px solid #9B59B6;
+      padding: 14px; border-left: 4px solid #9B59B6;
     }
-    .verse-meaning h4 { font-size: 14px; color: #9B59B6; margin-bottom: 8px; }
-    .verse-meaning p { font-size: 14px; color: #666; line-height: 1.7; }
+    .sl-meaning h4 { font-size: 13px; color: #9B59B6; margin-bottom: 7px; }
+    .sl-meaning p { font-size: 14px; color: #666; line-height: 1.7; }
 
-    .verse-btns { display: flex; gap: 12px; }
-    .verse-btn {
-      flex: 1; padding: 16px; border-radius: 14px; border: none;
-      color: white; font-size: 16px; font-weight: bold;
-      cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 8px;
+    .sl-btns { display: flex; gap: 10px; margin-top: 18px; }
+    .sl-btn {
+      flex: 1; padding: 15px; border-radius: 14px; border: none;
+      color: white; font-size: 15px; font-weight: bold;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .verse-btn.play { background: linear-gradient(135deg, #9B59B6, #8E44AD); }
-    .verse-btn.game { background: linear-gradient(135deg, #00B894, #00CEC9); }
+    .sl-btn.play { background: linear-gradient(135deg, #9B59B6, #8E44AD); }
+    .sl-btn.game { background: linear-gradient(135deg, #00B894, #00CEC9); }
 
-    .more-verses {
-      background: white; border-radius: 20px; padding: 22px;
+    .sl-more {
+      background: white; border-radius: 20px; padding: 20px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.06);
     }
-    .more-verses h4 { font-size: 16px; color: #9B59B6; margin-bottom: 15px; }
-    .verse-preview {
+    .sl-more h4 { font-size: 15px; color: #9B59B6; margin-bottom: 14px; }
+    .sl-more-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 12px 0; border-bottom: 1px dashed #eee;
+      padding: 11px 0; border-bottom: 1px dashed #eee;
       cursor: pointer;
     }
-    .verse-preview:last-child { border-bottom: none; }
-    .verse-preview:active { opacity: 0.7; }
-    .verse-num { font-size: 12px; color: #9B59B6; font-weight: bold; min-width: 40px; }
-    .verse-preview-text { flex: 1; font-size: 15px; color: #333; }
-    .verse-preview.done { color: #00B894; }
-    .verse-preview.done::after { content: ' ✓'; }
+    .sl-more-item:last-child { border-bottom: none; }
+    .sl-more-item:active { opacity: 0.7; }
+    .sl-more-num { font-size: 12px; color: #9B59B6; font-weight: bold; min-width: 42px; }
+    .sl-more-text { flex: 1; font-size: 14px; color: #333; }
+    .sl-more-item.done .sl-more-text { color: #00B894; }
+    .sl-more-item.done .sl-more-text::after { content: ' ✓'; }
 
-    /* ===== 游戏页 ===== */
-    .game-page { background: linear-gradient(180deg, #FFF9E6 0%, #FFF3CC 100%); min-height: 100vh; padding: 20px; }
+    /* ===== ====== 游戏页 ===== ====== */
+    .game-page { background: linear-gradient(180deg, #FFF9E6 0%, #FFF3CC 100%); min-height: 100vh; min-height: 100dvh; padding: 16px; }
     .game-title { text-align: center; font-size: 24px; color: #FF8E53; margin-bottom: 20px; }
-    .game-section { margin-bottom: 30px; }
-    .game-section h3 { font-size: 16px; color: #666; margin-bottom: 12px; }
-    .game-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .game-sec { margin-bottom: 26px; }
+    .game-sec h3 { font-size: 14px; color: #888; margin-bottom: 12px; padding-left: 4px; }
+    .game-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .game-card {
-      background: white; border-radius: 22px; padding: 25px 15px;
-      text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      cursor: pointer; transition: all 0.25s ease;
+      background: white; border-radius: 22px; padding: 22px 14px;
+      text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+      cursor: pointer; transition: transform 0.2s ease;
     }
     .game-card:active { transform: scale(0.96); }
-    .game-card.locked { opacity: 0.6; }
-    .game-icon { font-size: 50px; margin-bottom: 10px; }
-    .game-name { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 4px; }
+    .game-card.locked { opacity: 0.55; }
+    .game-icon { font-size: 48px; margin-bottom: 9px; }
+    .game-name { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 4px; }
     .game-desc { font-size: 12px; color: #999; }
-    .game-tag {
-      display: inline-block; padding: 3px 10px; border-radius: 10px;
-      font-size: 11px; margin-top: 8px;
-    }
+    .game-tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; margin-top: 7px; }
     .game-tag.hot { background: #FF6B6B; color: white; }
     .game-tag.new { background: #00B894; color: white; }
     .game-tag.soon { background: #ddd; color: #999; }
 
-    /* ===== 对对碰 ===== */
-    .match-page { background: linear-gradient(180deg, #E8F6F3 0%, #D5E8E4 100%); min-height: 100vh; padding: 20px; }
-    .match-header { text-align: center; margin-bottom: 15px; }
-    .match-header h3 { font-size: 22px; color: #2D3436; margin-bottom: 5px; }
-    .match-header p { font-size: 14px; color: #666; }
-    .match-score-board {
-      display: flex; justify-content: center; gap: 20px;
-      margin-bottom: 20px;
-    }
-    .score-item {
-      background: white; border-radius: 16px; padding: 12px 25px;
-      text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
-    .score-item .label { font-size: 12px; color: #999; }
-    .score-item .value { font-size: 28px; font-weight: bold; color: #FF6B35; }
+    /* ===== ====== 对对碰 ===== ====== */
+    .match-page { background: linear-gradient(180deg, #E8F6F3 0%, #D5E8E4 100%); min-height: 100vh; min-height: 100dvh; padding: 16px; }
+    .match-hdr { text-align: center; margin-bottom: 14px; }
+    .match-hdr h3 { font-size: 22px; color: #2D3436; margin-bottom: 4px; }
+    .match-hdr p { font-size: 13px; color: #888; }
+    .match-board { display: flex; justify-content: center; gap: 16px; margin-bottom: 18px; }
+    .score-box { background: white; border-radius: 16px; padding: 12px 24px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+    .score-box .lbl { font-size: 12px; color: #aaa; }
+    .score-box .val { font-size: 28px; font-weight: bold; color: #FF6B35; }
 
-    .match-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 12px; max-width: 360px; margin: 0 auto;
-    }
-    .match-card {
-      aspect-ratio: 1; background: white;
-      border-radius: 14px;
+    .match-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; max-width: 360px; margin: 0 auto; }
+    .m-card {
+      aspect-ratio: 1; background: white; border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      font-size: 20px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: all 0.2s ease; user-select: none;
     }
-    .match-card:active { transform: scale(0.95); }
-    .match-card.flipped { background: #4ECDC4; color: white; }
-    .match-card.matched { background: #00B894; color: white; }
-    .match-card.selected { background: #FF6B35; color: white; transform: scale(0.95); }
-    .match-card.wrong { animation: shake 0.4s ease; }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
+    .m-card:active { transform: scale(0.95); }
+    .m-card.flipped { background: #4ECDC4; color: white; }
+    .m-card.matched { background: #00B894; color: white; }
+    .m-card.selected { background: #FF6B35; color: white; transform: scale(0.95); }
+    .m-card.wrong { animation: shake 0.4s ease; }
 
-    .match-footer {
-      text-align: center; margin-top: 20px;
-      font-size: 14px; color: #666;
-    }
-    .match-complete {
-      text-align: center; padding: 30px; display: none;
-    }
+    .match-complete { text-align: center; padding: 30px; display: none; }
     .match-complete.show { display: block; }
-    .match-complete h3 { font-size: 28px; margin-bottom: 10px; }
-    .match-complete p { font-size: 16px; color: #666; }
+    .match-complete h3 { font-size: 28px; margin-bottom: 8px; }
+    .match-complete p { font-size: 15px; color: #888; }
 
-    /* ===== 庆祝动画 ===== */
-    .celebration {
-      position: fixed; inset: 0; pointer-events: none; z-index: 999;
-      display: none;
+    /* ===== ====== 家长页面 ===== ====== */
+    .parent-page { background: linear-gradient(180deg, #F0F4FF 0%, #E8EEFF 100%); min-height: 100vh; min-height: 100dvh; padding: 16px; }
+    .parent-card {
+      background: white; border-radius: 22px; padding: 22px;
+      margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.06);
     }
-    .celebration.show { display: block; }
-    .confetti {
-      position: absolute; font-size: 30px;
-      animation: confettiFall 2s ease-out forwards;
-    }
-    @keyframes confettiFall {
-      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-    }
-
-    /* ===== Toast ===== */
-    .toast {
-      position: fixed; top: 85px; left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: rgba(0,0,0,0.82); color: white;
-      padding: 14px 28px; border-radius: 30px;
-      font-size: 16px; z-index: 300;
-      opacity: 0; transition: all 0.3s ease; pointer-events: none;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ===== 星星爆炸 ===== */
-    .star-fly {
-      position: fixed; pointer-events: none; z-index: 400;
-      font-size: 36px; animation: starFlyUp 1s ease-out forwards;
-    }
-    @keyframes starFlyUp {
-      0% { opacity: 1; transform: scale(1) translateY(0); }
-      100% { opacity: 0; transform: scale(1.5) translateY(-80px); }
-    }
-
-    /* ===== 完成徽章 ===== */
-    .badge-popup {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-      display: none; align-items: center; justify-content: center;
-      z-index: 500;
-    }
-    .badge-popup.show { display: flex; }
-    .badge-content {
-      background: white; border-radius: 30px; padding: 40px;
-      text-align: center; animation: bounceIn 0.6s ease;
-    }
-    .badge-icon { font-size: 80px; margin-bottom: 15px; }
-    .badge-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 8px; }
-    .badge-desc { font-size: 15px; color: #666; margin-bottom: 20px; }
-    .badge-close {
-      padding: 14px 40px; border-radius: 30px; border: none;
-      background: linear-gradient(135deg, #FF6B35, #FF8E53);
-      color: white; font-size: 16px; font-weight: bold;
-      cursor: pointer;
-    }
+    .parent-card h3 { font-size: 17px; color: #333; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .parent-stat { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .parent-stat:last-child { border-bottom: none; }
+    .parent-stat .label { font-size: 14px; color: #666; }
+    .parent-stat .value { font-size: 18px; font-weight: bold; color: #FF6B35; }
+    .parent-bar { height: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 8px; overflow: hidden; }
+    .parent-bar-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #FF6B35, #FFD93D); transition: width 0.5s ease; }
+    .parent-list { margin-top: 12px; }
+    .parent-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+    .parent-item:last-child { border-bottom: none; }
+    .parent-item-icon { font-size: 22px; }
+    .parent-item-info { flex: 1; }
+    .parent-item-name { font-size: 14px; color: #333; }
+    .parent-item-meta { font-size: 12px; color: #aaa; }
+    .parent-item-status { font-size: 13px; color: #00B894; }
   </style>
 </head>
 <body>
+  <!-- 全局 -->
   <div class="celebration" id="celebration"></div>
-
   <div class="toast" id="toast"></div>
-
-  <div class="badge-popup" id="badgePopup">
-    <div class="badge-content">
+  <div class="badge-popup" id="badgePopup" onclick="if(event.target===this)closeBadge()">
+    <div class="badge-content" onclick="event.stopPropagation()">
       <div class="badge-icon" id="badgeIcon">🏆</div>
       <div class="badge-title" id="badgeTitle">获得成就！</div>
       <div class="badge-desc" id="badgeDesc"></div>
@@ -517,9 +497,9 @@
     </div>
   </div>
 
-  <!-- 顶部导航 -->
+  <!-- 顶部 -->
   <div class="top-bar" id="topBar" style="display:none;">
-    <button class="top-back" onclick="goBack()">←</button>
+    <button class="top-back" id="topBack" onclick="goBack()">←</button>
     <div class="top-title" id="topTitle">西游记·萌娃学文化</div>
     <div class="stars">
       <span class="star-icon">⭐</span>
@@ -529,96 +509,92 @@
 
   <!-- ========== 首页 ========== -->
   <div class="page active" id="homePage">
-    <div class="home-bg">
-      <div class="cloud" style="top:15%;left:5%;animation-delay:0s;">☁️</div>
-      <div class="cloud" style="top:25%;right:8%;animation-delay:1s;">☁️</div>
-      <div class="cloud" style="top:60%;left:3%;animation-delay:2s;">☁️</div>
-      <div class="cloud" style="top:70%;right:5%;animation-delay:0.5s;">☁️</div>
-    </div>
-    <div class="home-page" style="position:relative;z-index:1;">
-      <div class="welcome-text">
-        <h1>🌟 西游记·萌娃学文化</h1>
-        <p>跟齐天大圣一起学传统文化</p>
+    <div class="home-page">
+      <div class="clouds">
+        <div class="cloud">☁️</div><div class="cloud">☁️</div><div class="cloud">☁️</div>
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
       </div>
+      <div class="home-content">
+        <div class="welcome">
+          <h1>🌟 西游记·萌娃学文化</h1>
+          <p>跟齐天大圣学传统文化</p>
+        </div>
 
-      <div class="map-grid">
-        <div class="map-door story" onclick="jumpTo('story')">
-          <div class="door-icon">🐵</div>
-          <div class="door-title">悟空学苑</div>
-          <div class="door-desc">西游记故事</div>
-          <div class="door-stars" id="storyStars">☆☆☆</div>
+        <!-- 连续打卡 -->
+        <div class="streak-bar">
+          <div class="streak-left">
+            <div class="streak-fire" id="streakFire">🔥</div>
+            <div class="streak-info">
+              <div class="streak-days" id="streakDays">连续1天</div>
+              <div class="streak-label">学习打卡</div>
+            </div>
+          </div>
+          <div class="streak-dots" id="streakDots"></div>
         </div>
-        <div class="map-door sanjijing" onclick="jumpTo('sanjijing')">
-          <div class="door-icon">📖</div>
-          <div class="door-title">三字经课堂</div>
-          <div class="door-desc">人之初 性本善</div>
-          <div class="door-stars" id="sanjijingStars">☆☆☆</div>
-        </div>
-        <div class="map-door shenglv" onclick="jumpTo('shenglv')">
-          <div class="door-icon">🎵</div>
-          <div class="door-title">声律启蒙馆</div>
-          <div class="door-desc">云对雨 雪对风</div>
-          <div class="door-stars" id="shenglvStars">☆☆☆</div>
-        </div>
-        <div class="map-door game" onclick="jumpTo('game')">
-          <div class="door-icon">🎮</div>
-          <div class="door-title">游戏乐园</div>
-          <div class="door-desc">边玩边学</div>
-          <div class="door-stars" id="gameStars">☆☆☆</div>
-        </div>
-      </div>
 
-      <div style="text-align:center;margin-top:35px;">
-        <div style="font-size:14px;color:#ccc;">已收集 <span id="homeStars" style="color:#FFD93D;font-weight:bold;">0</span> 颗星星</div>
-        <div style="font-size:12px;color:#ddd;margin-top:5px;">{{ totalStars }} 全部可获得</div>
+        <div class="map-grid">
+          <div class="map-door story" onclick="jumpTo('story')">
+            <div class="door-icon">🐵</div>
+            <div class="door-title">悟空学苑</div>
+            <div class="door-desc">西游记故事</div>
+            <div class="door-stars" id="storyStars">☆☆☆</div>
+          </div>
+          <div class="map-door sanjijing" onclick="jumpTo('sanjijing')">
+            <div class="door-icon">📖</div>
+            <div class="door-title">三字经课堂</div>
+            <div class="door-desc">人之初 性本善</div>
+            <div class="door-stars" id="sanjijingStars">☆☆☆</div>
+          </div>
+          <div class="map-door shenglv" onclick="jumpTo('shenglv')">
+            <div class="door-icon">🎵</div>
+            <div class="door-title">声律启蒙馆</div>
+            <div class="door-desc">云对雨 雪对风</div>
+            <div class="door-stars" id="shenglvStars">☆☆☆</div>
+          </div>
+          <div class="map-door game" onclick="jumpTo('game')">
+            <div class="door-icon">🎮</div>
+            <div class="door-title">游戏乐园</div>
+            <div class="door-desc">边玩边学</div>
+            <div class="door-stars" id="gameStars">☆☆☆</div>
+          </div>
+        </div>
+
+        <div class="home-footer">
+          已收集 <span id="homeStars">0</span> / <span id="homeTotal">0</span> 颗星星
+          &nbsp;|&nbsp;
+          <a href="#" onclick="showParent(event)" style="color:#aaa;font-size:12px;text-decoration:none;">👨‍👩‍👦 家长中心</a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== 西游记故事页 ========== -->
+  <!-- ========== 故事页 ========== -->
   <div class="page" id="storyPage">
     <div class="story-page">
       <div class="story-hero">
-        <div class="story-palace">🏯</div>
+        <div class="story-sun" id="storyEmoji">🏯</div>
         <h2 id="storyTitle">大闹天宫</h2>
-        <p id="storySubtitle">齐天大圣大闹天宫的故事</p>
-        <div class="story-progress">
-          <div class="progress-dot active" id="dot1"></div>
-          <div class="progress-dot" id="dot2"></div>
-          <div class="progress-dot" id="dot3"></div>
-        </div>
+        <p id="storySub">齐天大圣大闹天宫的故事</p>
+        <div class="story-dots" id="storyDots"></div>
       </div>
       <div class="story-content">
-        <div class="story-text" id="storyText">
-          很久以前，有一只从石头里蹦出来的猴子，名叫孙悟空。他聪明勇敢，学了一身本领，还得到了金箍棒！
-          <br><br>
-          玉皇大帝封他做"弼马温"，可是孙悟空觉得自己被大材小用了，一气之下回到花果山，自封"齐天大圣"。
-          <br><br>
-          后来，悟空吃光了蟠桃，喝光了仙酒，还偷吃了太上老君的仙丹！天兵天将来抓他，都打不过他。悟空大闹天宫，谁都拦不住！
-        </div>
-
-        <div class="knowledge-card">
-          <h4>📚 知识点</h4>
-          <p><strong>托塔李天王：</strong>天上的神仙，手里拿的塔叫"玲珑塔"，还有乾坤圈能套住任何东西！</p>
-          <p><strong>太上老君：</strong>道教的祖师爷，他的八卦炉能炼出仙丹，悟空的火眼金睛就是在炉子里炼出来的！</p>
-        </div>
-
-        <button class="play-btn" id="playBtn" onclick="playStoryAudio()">
-          <span>🔊</span> <span id="playBtnText">听悟空讲故事</span>
+        <div class="story-text" id="storyText"></div>
+        <div class="knowledge-card" id="knowledgeCard"></div>
+        <button class="play-btn" id="playBtn" onclick="toggleAudio()">
+          <span>🔊</span><span id="playBtnText">听悟空讲故事</span>
         </button>
-
         <div class="quiz-section" id="quizSection">
           <div class="quiz-title">🧠 答对得星星</div>
-          <div class="quiz-question" id="quizQuestion">问题：孙悟空大闹天宫时，吃了哪些好东西？</div>
-          <div class="quiz-options" id="quizOptions">
-            <button class="quiz-option" onclick="answerQuiz(0)">A. 蟠桃和仙丹</button>
-            <button class="quiz-option" onclick="answerQuiz(1)">B. 萝卜和白菜</button>
-            <button class="quiz-option" onclick="answerQuiz(2)">C. 巧克力和蛋糕</button>
-          </div>
+          <div class="quiz-question" id="quizQuestion"></div>
+          <div class="quiz-options" id="quizOptions"></div>
           <div class="quiz-result" id="quizResult"></div>
-          <button class="next-btn" id="nextBtn" onclick="nextStory()">
-            下一个故事 →
-          </button>
+          <div class="quiz-footer">
+            <button class="retry-btn" id="retryBtn" onclick="resetQuiz()">🔄 再试一次</button>
+            <button class="next-btn" id="nextBtn" onclick="nextStory()">下一节 →</button>
+          </div>
+        </div>
+        <div class="reset-area" id="resetArea" style="display:none;">
+          <button class="reset-btn" onclick="resetStory()">🔄 重新学习</button>
         </div>
       </div>
     </div>
@@ -627,33 +603,25 @@
   <!-- ========== 三字经页 ========== -->
   <div class="page" id="sanjijingPage">
     <div class="sanjijing-page">
-      <div class="unit-nav" id="unitNav"></div>
-
-      <div class="sanjijing-unit" id="sanjijingUnit">
-        <div class="sanjijing-header">
-          <span class="sanjijing-unit-title" id="unitTitle">第一课</span>
-          <div class="sanjijing-unit-stars" id="unitStars">☆☆☆</div>
+      <div class="sj-unit-nav" id="sjNav"></div>
+      <div class="sj-card">
+        <div class="sj-header">
+          <span class="sj-unit-badge" id="sjTitle">第一课</span>
+          <div class="sj-unit-stars" id="sjStars">☆☆☆</div>
         </div>
-        <div class="sanjijing-text" id="sanjijingText"></div>
-        <div class="meaning-box">
+        <div class="sj-text" id="sjText"></div>
+        <div class="sj-meaning">
           <h4>📖 含义</h4>
-          <p id="meaningText">人出生的时候，本性都是善良的。后来因为生活环境不同，性情就变坏了。</p>
+          <p id="sjMeaning"></p>
         </div>
-        <div class="sanjijing-actions">
-          <button class="read-btn" onclick="readSanjijing()">
-            <span>🔊</span> 听朗读
-          </button>
-          <button class="test-btn" onclick="showSanjijingQuiz()">
-            <span>🧠</span> 小测验
-          </button>
+        <div class="sj-actions">
+          <button class="sj-btn read" onclick="readSj()">🔊 听朗读</button>
+          <button class="sj-btn test" onclick="showSjQuiz()">🧠 小测验</button>
         </div>
-
-        <div class="quiz-card" id="sanjijingQuiz">
-          <h4>答对得1颗星星</h4>
-          <div class="quiz-question" id="sjQuestion">人之初，性本善，"初"是什么意思？</div>
-          <button class="quiz-option" onclick="sjAnswer(0)">A. 开始、最开始</button>
-          <button class="quiz-option" onclick="sjAnswer(1)">B. 衣服</button>
-          <button class="quiz-option" onclick="sjAnswer(2)">C. 刀子</button>
+        <div class="sj-quiz" id="sjQuiz">
+          <h4>答对得 ⭐</h4>
+          <div class="sj-quiz-q" id="sjQuizQ"></div>
+          <div id="sjQuizOpts"></div>
         </div>
       </div>
     </div>
@@ -662,47 +630,47 @@
   <!-- ========== 声律启蒙页 ========== -->
   <div class="page" id="shenglvPage">
     <div class="shenglv-page">
-      <div class="verse-card">
-        <div class="verse-header">
+      <div class="sl-card">
+        <div class="sl-header">
           <h3>声律启蒙 · 一东</h3>
           <p>最简单的对仗练习</p>
         </div>
-        <div class="verse-display">
-          <div class="verse-line">
-            <span class="verse-item" id="v1">云</span>
-            <span class="verse-sep">对</span>
-            <span class="verse-item" id="v2">雨</span>
+        <div class="sl-display">
+          <div class="sl-line">
+            <span class="sl-item" id="sl1">云</span>
+            <span class="sl-sep">对</span>
+            <span class="sl-item" id="sl2">雨</span>
           </div>
-          <div class="verse-line">
-            <span class="verse-item" id="v3">雪</span>
-            <span class="verse-sep">对</span>
-            <span class="verse-item" id="v4">风</span>
+          <div class="sl-line">
+            <span class="sl-item" id="sl3">雪</span>
+            <span class="sl-sep">对</span>
+            <span class="sl-item" id="sl4">风</span>
           </div>
-          <div class="verse-line">
-            <span class="verse-item" id="v5">晚照</span>
-            <span class="verse-sep">对</span>
-            <span class="verse-item" id="v6">晴空</span>
+          <div class="sl-line">
+            <span class="sl-item" id="sl5">晚照</span>
+            <span class="sl-sep">对</span>
+            <span class="sl-item" id="sl6">晴空</span>
           </div>
         </div>
-        <div class="verse-meaning">
+        <div class="sl-meaning">
           <h4>📖 含义</h4>
-          <p>云和雨是一对（下雨的时候云会变成雨），雪和风是一对，傍晚的阳光对应晴朗的天空。这是古人学习作诗的基本功，叫"对仗"。</p>
+          <p>云和雨是一对（云变成雨落下来），雪和风是一对，傍晚的阳光对应晴朗的天空。这是古人学诗的基本功，叫"对仗"——词语要成双成对。</p>
         </div>
-        <div class="verse-btns">
-          <button class="verse-btn play" onclick="playVerse()">🔊 听朗读</button>
-          <button class="verse-btn game" onclick="startMatch()">🎮 去玩对对碰</button>
+        <div class="sl-btns">
+          <button class="sl-btn play" onclick="playSl()">🔊 听朗读</button>
+          <button class="sl-btn game" onclick="jumpTo('match')">🎮 对对碰</button>
         </div>
       </div>
 
-      <div class="more-verses">
+      <div class="sl-more">
         <h4>📚 更多声律启蒙（陆续开放）</h4>
-        <div class="verse-preview" onclick="showLocked()">
-          <span class="verse-num">二冬</span>
-          <span class="verse-preview-text">春对夏，秋对冬，暮鼓对晨钟</span>
+        <div class="sl-more-item" onclick="toast('陆续开放中，敬请期待！')">
+          <span class="sl-more-num">二冬</span>
+          <span class="sl-more-text">春对夏，秋对冬，暮鼓对晨钟</span>
         </div>
-        <div class="verse-preview" onclick="showLocked()">
-          <span class="verse-num">三江</span>
-          <span class="verse-preview-text">楼对阁，户对窗，巨海对长江</span>
+        <div class="sl-more-item" onclick="toast('陆续开放中，敬请期待！')">
+          <span class="sl-more-num">三江</span>
+          <span class="sl-more-text">楼对阁，户对窗，巨海对长江</span>
         </div>
       </div>
     </div>
@@ -712,37 +680,31 @@
   <div class="page" id="gamePage">
     <div class="game-page">
       <div class="game-title">🎮 游戏乐园</div>
-
-      <div class="game-section">
+      <div class="game-sec">
         <h3>已开放</h3>
         <div class="game-cards">
-          <div class="game-card" onclick="startMatch()">
-            <div class="game-icon">🎴</div>
-            <div class="game-name">对对碰</div>
+          <div class="game-card" onclick="jumpTo('match')">
+            <div class="game-icon">🎴</div><div class="game-name">对对碰</div>
             <div class="game-desc">声律启蒙配对</div>
             <span class="game-tag hot">热门</span>
           </div>
-          <div class="game-card" onclick="startMatch()">
-            <div class="game-icon">🧠</div>
-            <div class="game-name">每日答题</div>
-            <div class="game-desc">知识小测验</div>
+          <div class="game-card" onclick="jumpTo('story')">
+            <div class="game-icon">🧠</div><div class="game-name">每日答题</div>
+            <div class="game-desc">西游记小测验</div>
             <span class="game-tag new">新增</span>
           </div>
         </div>
       </div>
-
-      <div class="game-section">
+      <div class="game-sec">
         <h3>即将推出</h3>
         <div class="game-cards">
           <div class="game-card locked">
-            <div class="game-icon">🧩</div>
-            <div class="game-name">消消乐</div>
+            <div class="game-icon">🧩</div><div class="game-name">消消乐</div>
             <div class="game-desc">西游记人物消消乐</div>
             <span class="game-tag soon">敬请期待</span>
           </div>
           <div class="game-card locked">
-            <div class="game-icon">🎨</div>
-            <div class="game-name">贴贴乐</div>
+            <div class="game-icon">🎨</div><div class="game-name">贴贴乐</div>
             <div class="game-desc">年画贴纸创作</div>
             <span class="game-tag soon">敬请期待</span>
           </div>
@@ -754,35 +716,145 @@
   <!-- ========== 对对碰 ========== -->
   <div class="page" id="matchPage">
     <div class="match-page">
-      <div class="match-header">
+      <div class="match-hdr">
         <h3>🎴 对对碰 · 声律启蒙</h3>
         <p>把词语对仗连起来</p>
       </div>
-      <div class="match-score-board">
-        <div class="score-item">
-          <div class="label">配对</div>
-          <div class="value" id="matchCount">0</div>
+      <div class="match-board">
+        <div class="score-box"><div class="lbl">配对</div><div class="val" id="mCount">0</div></div>
+        <div class="score-box"><div class="lbl">剩余</div><div class="val" id="mLeft">3</div></div>
+      </div>
+      <div class="match-grid" id="mGrid"></div>
+      <div class="match-complete" id="mComplete">
+        <h3>🎉 太厉害了！</h3>
+        <p>全部配对成功！获得3颗星星！</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 家长中心 ========== -->
+  <div class="page" id="parentPage">
+    <div class="parent-page">
+      <div style="text-align:center;padding:20px 0 10px;">
+        <div style="font-size:48px;">👨‍👩‍👦</div>
+        <h2 style="font-size:22px;color:#333;margin-top:8px;">家长中心</h2>
+        <p style="font-size:13px;color:#aaa;margin-top:4px;">了解孩子的学习进度</p>
+      </div>
+
+      <div class="parent-card">
+        <h3>⭐ 星星收集</h3>
+        <div class="parent-stat">
+          <span class="label">已获得星星</span>
+          <span class="value" id="pStars">0</span>
         </div>
-        <div class="score-item">
-          <div class="label">剩余</div>
-          <div class="value" id="matchLeft">3</div>
+        <div class="parent-stat">
+          <span class="label">学习进度</span>
+          <span class="value" id="pProgress">0%</span>
+        </div>
+        <div class="parent-bar"><div class="parent-bar-fill" id="pBar" style="width:0%"></div></div>
+      </div>
+
+      <div class="parent-card">
+        <h3>📚 各模块进度</h3>
+        <div class="parent-stat">
+          <span class="label">悟空学苑</span>
+          <span class="value" id="pStory">0/3故事</span>
+        </div>
+        <div class="parent-stat">
+          <span class="label">三字经</span>
+          <span class="value" id="pSj">0/8课</span>
+        </div>
+        <div class="parent-stat">
+          <span class="label">声律启蒙</span>
+          <span class="value" id="pSl">未开始</span>
+        </div>
+        <div class="parent-stat">
+          <span class="label">游戏</span>
+          <span class="value" id="pGame">未开始</span>
         </div>
       </div>
-      <div class="match-grid" id="matchGrid"></div>
-      <div class="match-complete" id="matchComplete">
-        <h3>🎉 太厉害了！</h3>
-        <p>全部配对成功！</p>
+
+      <div class="parent-card">
+        <h3>📅 打卡记录</h3>
+        <div class="parent-stat">
+          <span class="label">连续学习</span>
+          <span class="value" id="pStreak">1天</span>
+        </div>
+        <div class="parent-stat">
+          <span class="label">最近学习</span>
+          <span class="value" id="pLast">今天</span>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // ========== 数据 ==========
-    const SANJIJING_UNITS = [
-      { title: '第一课', text: '人之初，性本善，性相近，习相远', meaning: '人出生的时候，本性都是善良的。后来因为生活环境不同，性情就变坏了。', quiz: ['开始、最开始', '衣服', '刀子'], answer: 0 },
-      { title: '第二课', text: '苟不教，性乃迁，教之道，贵以专', meaning: '如果不好好教育他，善良的本性就会变坏。教育的方法，最重要的是专心一致。', quiz: ['学习方法', '吃的食物', '穿的衣服', '贵的东西'], answer: 0 },
-      { title: '第三课', text: '昔孟母，择邻处，子不学，断机杼', meaning: '从前孟子的母亲，为了怕孟子学坏，三次搬家选择邻居。孟子不学习时，母亲剪断了织布。', quiz: ['孟子的母亲', '孟子的父亲', '孟子的老师'], answer: 0 },
-      { title: '第四课', text: '窦燕山，有义方，教五子，名俱扬', meaning: '窦燕山教育孩子有好的方法，五个孩子都很有成就，名声都传扬开了。', quiz: ['五个孩子都有成就', '五个孩子都不学习', '五个孩子很调皮'], answer: 0 },
+    /* ==============================================
+       数据
+    ============================================== */
+    const STORIES = [
+      {
+        id: 0,
+        title: '大闹天宫',
+        sub: '齐天大圣大闹天宫的故事',
+        emoji: '🏯',
+        text: `<p>很久以前，有一只从石头里蹦出来的猴子，名叫孙悟空。他聪明勇敢，学了一身本领，还得到了金箍棒作为武器。</p>
+<p>玉皇大帝封他做"弼马温"，可是孙悟空觉得自己被大材小用了，一气之下回到花果山，自封"齐天大圣"。</p>
+<p>后来，玉皇大帝请他去看守蟠桃园。王母娘娘开蟠桃盛会，没请孙悟空。悟空一怒之下，吃光了蟠桃，喝光了仙酒，还偷吃了太上老君的仙丹！</p>
+<p>天兵天将来抓他，都打不过他。最后太上老君用八卦炉炼他，反而炼出了火眼金睛。悟空打翻了炼丹炉，大闹天宫，谁都拦不住他！</p>
+<p>最后，如来佛祖来了，把孙悟空压在五行山下整整五百年。直到后来，唐僧取经路过，才把他救了出来。</p>`,
+        knowledge: [
+          { q: '托塔李天王是谁？', opts: ['天上的神仙，手里拿玲珑塔', '玉皇大帝的大臣', '孙悟空的师傅'], answer: 0 },
+          { q: '孙悟空被谁压在五行山下？', opts: ['玉皇大帝', '如来佛祖', '太上老君'], answer: 1 },
+          { q: '火眼金睛是怎么来的？', opts: ['吃仙丹得到的', '太上老君的八卦炉里炼出来的', '天生的'], answer: 1 },
+        ],
+        stars: 3,
+      },
+      {
+        id: 1,
+        title: '三打白骨精',
+        sub: '白骨夫人三次变身骗唐僧',
+        emoji: '👻',
+        text: `<p>唐僧师徒四人取经路上，来到一座大山。山上有个白骨精，她听说吃了唐僧肉可以长生不老，就想抓走唐僧。</p>
+<p>白骨精第一次变成一个漂亮的姑娘，提着饭菜来骗唐僧。孙悟空一眼看穿，举起金箍棒就打。白骨精丢下假尸跑了，真身逃走了。</p>
+<p>第二次，白骨精变成一个老婆婆，说是来找女儿的。唐僧已经有点相信悟空了，但孙悟空还是认出她，打死了老婆婆。白骨精又跑了。</p>
+<p>第三次，白骨精变成一个老公公，说是在找他的妻子和女儿。孙悟空这次更仔细地打，终于把白骨精打死了。</p>
+<p>白骨精死后，现出原形——一堆白骨上面写着"白骨夫人"。可是唐僧已经不相信孙悟空了，一气之下把悟空赶走了。</p>`,
+        knowledge: [
+          { q: '白骨精想吃谁的长生不老肉？', opts: ['猪八戒', '孙悟空', '唐僧'], answer: 2 },
+          { q: '白骨精变成了几个人？', opts: ['1个', '2个', '3个'], answer: 2 },
+          { q: '最后谁被唐僧赶走了？', opts: ['猪八戒', '沙僧', '孙悟空'], answer: 2 },
+        ],
+        stars: 3,
+      },
+      {
+        id: 2,
+        title: '火焰山借扇',
+        sub: '孙悟空三借芭蕉扇',
+        emoji: '🔥',
+        text: `<p>唐僧师徒来到一座燃烧着熊熊大火的高山。原来这座山是当年孙悟空大闹天宫时踢翻了太上老君的炼丹炉，掉下来的火砖形成的。</p>
+<p>要想过去，只有一个办法——借铁扇公主的芭蕉扇。孙悟空去借扇子，可是铁扇公主因为红孩儿的事很恨孙悟空，不肯借。</p>
+<p>第一次，孙悟空变成虫子钻进铁扇公主肚子里，逼她交出扇子。可是拿到的是一把假扇子，越扇火越大！</p>
+<p>第二次，孙悟空变成牛魔王的样子，骗走了真正的芭蕉扇。铁扇公主发现后追上来，牛魔王也变成猪八戒的样子又把扇子骗了回去。</p>
+<p>第三次，孙悟空联合猪八戒，打败了铁扇公主和牛魔王，终于借到了真正的芭蕉扇，扇灭了火焰山的火，继续西天取经。</p>`,
+        knowledge: [
+          { q: '火焰山的火是怎么来的？', opts: ['太阳太热', '孙悟空踢翻了太上老君的炼丹炉', '铁扇公主放的火'], answer: 1 },
+          { q: '芭蕉扇是谁的？', opts: ['铁扇公主', '太上老君', '观音菩萨'], answer: 0 },
+          { q: '孙悟空借了几次扇子才成功？', opts: ['1次', '2次', '3次'], answer: 2 },
+        ],
+        stars: 3,
+      },
+    ];
+
+    const SANJIJING = [
+      { title: '第一课', text: '人之初，性本善，性相近，习相远', meaning: '人出生的时候，本性都是善良的。后来因为生活环境不同，性情就变坏了。', quiz: '这句中，"初"是什么意思？', opts: ['开始、最开始', '衣服', '刀子'], answer: 0 },
+      { title: '第二课', text: '苟不教，性乃迁，教之道，贵以专', meaning: '如果不好好教育他，善良的本性就会变坏。教育的方法，最重要的是专心致志、持之以恒。', quiz: '"贵以专"中的"贵"是什么意思？', opts: ['贵重、重要', '有钱', '乌龟'], answer: 0 },
+      { title: '第三课', text: '昔孟母，择邻处，子不学，断机杼', meaning: '从前孟子的母亲，为了让孟子有好的学习环境，三次搬家选择邻居。孟子不好好学习时，母亲剪断了织布（以此告诫）。', quiz: '孟母为什么三次搬家？', opts: ['不喜欢原来的房子', '为了给孟子找好的学习环境', '为了离河流近'], answer: 1 },
+      { title: '第四课', text: '窦燕山，有义方，教五子，名俱扬', meaning: '窦燕山教育孩子有好的方法，五个孩子都很有成就，名声都传扬开了。', quiz: '"五子"是什么意思？', opts: ['五个儿子', '五个学生', '五个人'], answer: 0 },
+      { title: '第五课', text: '养不教，父之过，教不严，师之惰', meaning: '生了孩子却不教育，是父亲的过错；教育学生不严格，是老师的懒惰。', quiz: '"父之过"是什么意思？', opts: ['父亲的错误', '父亲的过程', '父亲的家'], answer: 0 },
+      { title: '第六课', text: '子不学，非所宜，幼不学，老何为', meaning: '小孩子不愿意学习，这是不应该的。年少时不肯学习，年老的时候能有什么作为呢？', quiz: '这句告诉我们什么道理？', opts: ['要认真学习', '要早点睡觉', '要多吃东西'], answer: 0 },
+      { title: '第七课', text: '玉不琢，不成器，人不学，不知义', meaning: '玉石不经过雕琢，就不能成为有用的器物；人不学习，就不懂得道理。', quiz: '"琢"在文中指的是？', opts: ['砍树', '雕琢玉石', '写字'], answer: 1 },
+      { title: '第八课', text: '为人子，方少时，亲师友，习礼仪', meaning: '做孩子的，在年少的时候，应该亲近老师和朋友，学习礼貌和礼仪。', quiz: '年少时应该怎样做？', opts: ['多玩游戏', '亲近师友，习礼仪', '多吃零食'], answer: 1 },
     ];
 
     const MATCH_PAIRS = [
@@ -791,112 +863,160 @@
       { left: '晚照', right: '晴空' },
     ];
 
-    const ALL_STARS = 13; // story:3 + sanjijing:4 + shenglv:3 + game:3
+    const TOTAL_STARS = STORIES.reduce((a,s)=>a+s.stars,0) + SANJIJING.length + 3;
 
-    // ========== 状态 ==========
-    let state = loadState();
-    let currentSjUnit = 0;
-    let matchSelected = null;
-    let matchDone = 0;
+    /* ==============================================
+       状态
+    ============================================== */
+    let S = loadState();
+    let curStory = 0;
+    let curSj = 0;
+    let quizIdx = 0;
+    let quizAnswered = false;
+    let mSelected = null;
+    let mDone = 0;
     let currentPage = 'home';
     let isPlaying = false;
+    let speechUtterance = null;
 
-    function loadState() {
-      const saved = localStorage.getItem('xiyouji_kids_v2');
-      if (saved) return JSON.parse(saved);
+    function newState() {
       return {
         totalStars: 0,
-        storyDone: false,
-        sanjijingDone: [false, false, false, false],
+        storyProgress: 0,   // 0/1/2/3 = 未开始/故事1完成/...
+        storyStars: 0,
+        sjProgress: Array(SANJIJING.length).fill(false),
+        sjCurrent: 0,
         shenglvDone: false,
         matchDone: false,
+        streak: 1,
+        lastDate: today(),
       };
     }
 
-    function saveState() {
-      localStorage.setItem('xiyouji_kids_v2', JSON.stringify(state));
+    function loadState() {
+      try {
+        const d = JSON.parse(localStorage.getItem('xjkids_v3') || '{}');
+        // 校验日期
+        if (d.lastDate !== today()) {
+          d.streak = (d.lastDate === yesterday()) ? (d.streak||1)+1 : 1;
+          d.lastDate = today();
+          saveState(d);
+        }
+        return d;
+      } catch(e) { return newState(); }
+    }
+
+    function saveState(override) {
+      const d = override || S;
+      localStorage.setItem('xjkids_v3', JSON.stringify(d));
+    }
+
+    function today() { return new Date().toISOString().slice(0,10); }
+    function yesterday() {
+      const d = new Date(); d.setDate(d.getDate()-1);
+      return d.toISOString().slice(0,10);
     }
 
     function updateUI() {
-      document.getElementById('starCount').textContent = state.totalStars;
-      document.getElementById('homeStars').textContent = state.totalStars;
+      const storyDone = S.storyProgress || 0;
+      const sjDone = (S.sjProgress||[]).filter(Boolean).length;
+      const slS = S.shenglvDone ? 3 : 0;
+      const gS = S.matchDone ? 3 : 0;
 
-      const storyS = state.storyDone ? 3 : 0;
-      const sjS = state.sanjijingDone.filter(Boolean).length;
-      const slS = state.shenglvDone ? 3 : 0;
-      const gS = state.matchDone ? 3 : 0;
+      document.getElementById('starCount').textContent = S.totalStars;
+      document.getElementById('homeStars').textContent = S.totalStars;
+      document.getElementById('homeTotal').textContent = TOTAL_STARS;
 
-      document.getElementById('storyStars').textContent = '★'.repeat(storyS) + '☆'.repeat(3-storyS);
-      document.getElementById('sanjijingStars').textContent = '★'.repeat(Math.min(sjS,3)) + '☆'.repeat(Math.max(0,3-sjS));
+      const ss = Math.min(storyDone, 3);
+      document.getElementById('storyStars').textContent = '★'.repeat(ss) + '☆'.repeat(Math.max(0,3-ss));
+      const sjS = Math.min(sjDone, 3);
+      document.getElementById('sanjijingStars').textContent = '★'.repeat(sjS) + '☆'.repeat(Math.max(0,3-sjS));
       document.getElementById('shenglvStars').textContent = '★'.repeat(slS) + '☆'.repeat(3-slS);
       document.getElementById('gameStars').textContent = '★'.repeat(gS) + '☆'.repeat(3-gS);
+
+      // 打卡
+      const streak = S.streak || 1;
+      document.getElementById('streakDays').textContent = `连续${streak}天`;
+      document.getElementById('streakFire').style.transform = streak >= 3 ? 'scale(1.2)' : 'scale(1)';
+      const dotsEl = document.getElementById('streakDots');
+      dotsEl.innerHTML = '';
+      for (let i=0; i<7; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'streak-dot' + (i < (streak%7||7) ? ' done' : '') + (i === (streak%7||7)-1 ? ' today' : '');
+        dot.textContent = ['一','二','三','四','五','六','日'][i];
+        dotsEl.appendChild(dot);
+      }
     }
 
-    // ========== 页面导航 ==========
+    /* ==============================================
+       页面导航
+    ============================================== */
     function showPage(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       currentPage = id;
       document.getElementById('topBar').style.display = id === 'homePage' ? 'none' : 'flex';
+
+      if (id === 'parentPage') renderParent();
     }
 
     function goBack() {
-      const routes = { storyPage: 'homePage', sanjijingPage: 'homePage', shenglvPage: 'homePage', gamePage: 'homePage', matchPage: 'gamePage' };
-      showPage(routes[currentPage] || 'homePage');
-      document.getElementById('topTitle').textContent = {
-        storyPage: '悟空学苑', sanjijingPage: '三字经课堂',
-        shenglvPage: '声律启蒙馆', gamePage: '游戏乐园', matchPage: '对对碰'
-      }[currentPage] || '';
+      const map = { storyPage:'homePage', sanjijingPage:'homePage', shenglvPage:'homePage', gamePage:'homePage', matchPage:'gamePage', parentPage:'homePage' };
+      showPage(map[currentPage] || 'homePage');
+      document.getElementById('topTitle').textContent = { storyPage:'悟空学苑', sanjijingPage:'三字经课堂', shenglvPage:'声律启蒙馆', gamePage:'游戏乐园', matchPage:'游戏乐园', parentPage:'家长中心' }[currentPage] || '';
     }
 
     function jumpTo(section) {
-      const map = { story: 'storyPage', sanjijing: 'sanjijingPage', shenglv: 'shenglvPage', game: 'gamePage' };
-      showPage(map[section]);
-      document.getElementById('topTitle').textContent = {
-        storyPage: '悟空学苑', sanjijingPage: '三字经课堂',
-        shenglvPage: '声律启蒙馆', gamePage: '游戏乐园'
-      }[map[section]] || '';
-
-      if (section === 'sanjijing') renderSanjijing();
-      if (section === 'match') startMatch();
+      const map = { story:'storyPage', sanjijing:'sanjijingPage', shenglv:'shenglvPage', game:'gamePage', match:'matchPage' };
+      if (section === 'story' || section === 'sanjijing') {
+        showPage(map[section]);
+        document.getElementById('topTitle').textContent = { storyPage:'悟空学苑', sanjijingPage:'三字经课堂' }[map[section]];
+        if (section === 'story') renderStory();
+        if (section === 'sanjijing') renderSanjijing();
+      } else {
+        showPage(map[section] || 'gamePage');
+        document.getElementById('topTitle').textContent = { shenglvPage:'声律启蒙馆', gamePage:'游戏乐园', matchPage:'游戏乐园' }[map[section]] || '游戏乐园';
+        if (section === 'match') startMatch();
+      }
     }
 
-    // ========== Toast ==========
-    function showToast(msg) {
+    /* ==============================================
+       Toast / 庆祝 / 星星
+    ============================================== */
+    function toast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg; t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    // ========== 星星动画 ==========
-    function flyStar(x, y, count=1) {
-      for (let i=0; i<count; i++) {
+    function flyStar(x,y,count=1) {
+      for (let i=0;i<count;i++) {
         setTimeout(() => {
           const s = document.createElement('div');
           s.className = 'star-fly';
           s.textContent = ['⭐','🌟','✨'][Math.floor(Math.random()*3)];
-          s.style.left = (x + (Math.random()-0.5)*60) + 'px';
-          s.style.top = y + 'px';
+          s.style.left = (x+(Math.random()-0.5)*50)+'px';
+          s.style.top = y+'px';
           document.body.appendChild(s);
-          setTimeout(() => s.remove(), 1000);
-        }, i*200);
+          setTimeout(()=>s.remove(),900);
+        }, i*180);
       }
     }
 
     function celebrate() {
       const c = document.getElementById('celebration');
       c.innerHTML = '';
-      const emojis = ['🎉','⭐','🌟','✨','🎊','🏆'];
-      for (let i=0; i<20; i++) {
+      const emojis = ['🎉','⭐','🌟','✨','🎊','🏆','🌈'];
+      for (let i=0;i<25;i++) {
         const d = document.createElement('div');
         d.className = 'confetti';
         d.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-        d.style.left = Math.random()*100 + 'vw';
-        d.style.animationDelay = Math.random()*0.8 + 's';
+        d.style.left = Math.random()*100+'vw';
+        d.style.animationDelay = Math.random()*0.8+'s';
         c.appendChild(d);
       }
       c.classList.add('show');
-      setTimeout(() => c.classList.remove('show'), 2500);
+      setTimeout(()=>c.classList.remove('show'), 2500);
     }
 
     function showBadge(icon, title, desc) {
@@ -906,266 +1026,413 @@
       document.getElementById('badgePopup').classList.add('show');
     }
 
-    function closeBadge() {
-      document.getElementById('badgePopup').classList.remove('show');
-    }
+    function closeBadge() { document.getElementById('badgePopup').classList.remove('show'); }
 
-    // ========== TTS ==========
+    /* ==============================================
+       TTS
+    ============================================== */
     function speak(text) {
-      if (!('speechSynthesis' in window)) { showToast('浏览器不支持朗读'); return; }
+      if (!('speechSynthesis' in window)) { toast('浏览器不支持朗读'); return; }
       window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'zh-CN'; u.rate = 0.85; u.pitch = 1.1;
+      speechUtterance = new SpeechSynthesisUtterance(text);
+      speechUtterance.lang = 'zh-CN';
+      speechUtterance.rate = 0.82;
+      speechUtterance.pitch = 1.1;
       const voices = window.speechSynthesis.getVoices();
       const zh = voices.find(v => v.lang.includes('zh'));
-      if (zh) u.voice = zh;
-      u.onend = () => { isPlaying = false; updatePlayBtn(); };
-      window.speechSynthesis.speak(u);
+      if (zh) speechUtterance.voice = zh;
+      speechUtterance.onend = () => { isPlaying = false; updatePlayBtn(); };
+      speechUtterance.onerror = () => { isPlaying = false; updatePlayBtn(); };
+      speechUtterance.onstart = () => { isPlaying = true; updatePlayBtn(); };
+      window.speechSynthesis.speak(speechUtterance);
       isPlaying = true;
+      updatePlayBtn();
+    }
+
+    function stopSpeech() {
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      isPlaying = false;
       updatePlayBtn();
     }
 
     function updatePlayBtn() {
       const btn = document.getElementById('playBtn');
       const txt = document.getElementById('playBtnText');
-      if (isPlaying) {
-        btn.classList.add('playing'); txt.textContent = '🔊 播放中...';
-      } else {
-        btn.classList.remove('playing'); txt.textContent = '听悟空讲故事';
+      if (!btn) return;
+      if (isPlaying) { btn.classList.add('playing'); txt.textContent = '⏸ 播放中...'; }
+      else { btn.classList.remove('playing'); txt.textContent = '🔊 听悟空讲故事'; }
+    }
+
+    function toggleAudio() {
+      if (isPlaying) { stopSpeech(); }
+      else {
+        const el = document.getElementById('storyText');
+        if (el) speak(el.textContent.replace(/\s+/g,''));
       }
     }
 
-    function playStoryAudio() {
-      const text = document.getElementById('storyText').textContent.replace(/\n/g,'');
-      speak(text);
+    /* ==============================================
+       故事
+    ============================================== */
+    function renderStory() {
+      stopSpeech();
+      const story = STORIES[curStory];
+
+      document.getElementById('storyEmoji').textContent = story.emoji;
+      document.getElementById('storyTitle').textContent = story.title;
+      document.getElementById('storySub').textContent = story.sub;
+      document.getElementById('storyText').innerHTML = story.text;
+
+      // 知识点（只用当前故事的）
+      const kc = document.getElementById('knowledgeCard');
+      const storyKnows = story.knowledge;
+      kc.innerHTML = `<h4>📚 知识点</h4>` +
+        storyKnows.map(k => `<p><strong>${k.q}</strong></p>`).join('');
+
+      // 进度点
+      const dotsEl = document.getElementById('storyDots');
+      dotsEl.innerHTML = '';
+      STORIES.forEach((s,i) => {
+        const d = document.createElement('div');
+        d.className = 'story-dot' + (i===curStory?' active':'') + (i<curStory?' done':'');
+        d.onclick = () => { curStory=i; quizIdx=0; quizAnswered=false; renderStory(); };
+        dotsEl.appendChild(d);
+      });
+
+      renderQuiz();
+      updateResetArea();
     }
 
-    // ========== 故事测验 ==========
-    let quizAnswered = false;
+    function renderQuiz() {
+      const story = STORIES[curStory];
+      // 星星已获得则不允许重复答第一题（resetStory 里有 quizIdx=0 会重新开始）
+
+      document.getElementById('quizQuestion').textContent = `(${quizIdx+1}/${story.knowledge.length}) ${story.knowledge[quizIdx].q}`;
+
+      const optsEl = document.getElementById('quizOptions');
+      optsEl.innerHTML = '';
+      story.knowledge[quizIdx].opts.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = `${'ABC'[i]}. ${opt}`;
+        btn.onclick = () => answerQuiz(i);
+        optsEl.appendChild(btn);
+      });
+
+      document.getElementById('quizResult').style.display = 'none';
+      document.getElementById('retryBtn').classList.remove('show');
+      document.getElementById('nextBtn').classList.remove('show');
+    }
 
     function answerQuiz(idx) {
-      if (quizAnswered || state.storyDone) return;
-      quizAnswered = true;
-
+      if (quizAnswered) return;
+      const story = STORIES[curStory];
+      const correct = story.knowledge[quizIdx].answer;
       const opts = document.querySelectorAll('#quizOptions .quiz-option');
+
+      quizAnswered = true;
       opts.forEach((o,i) => {
-        if (i===0) o.classList.add('correct');
-        if (i===idx && idx!==0) { o.classList.add('wrong'); opts[0].classList.add('faded'); }
-        if (i!==0 && i!==idx) o.classList.add('faded');
+        if (i===correct) o.classList.add('correct');
+        if (i===idx && idx!==correct) o.classList.add('wrong');
+        if (i!==correct && i!==idx) o.classList.add('faded');
       });
 
       const result = document.getElementById('quizResult');
-      if (idx === 0) {
-        result.textContent = '🎉 答对啦！太厉害了！'; result.className = 'quiz-result success';
-        state.storyDone = true;
-        state.totalStars += 3;
-        saveState(); updateUI();
-        document.getElementById('nextBtn').classList.add('show');
-        const r = document.getElementById('quizSection').getBoundingClientRect();
-        flyStar(r.left + r.width/2, r.top + r.height/2, 3);
-        setTimeout(() => {
-          if (state.totalStars >= 3) showBadge('🏆', '悟空学苑完成！', '你学会了《大闹天宫》的故事！');
-          celebrate();
-        }, 800);
+      if (idx === correct) {
+        result.textContent = '🎉 答对啦！'; result.className = 'quiz-result success';
+        const lastQ = quizIdx === story.knowledge.length-1;
+
+        if (lastQ) {
+          // 全部答对
+          const prevProgress = S.storyProgress || 0;
+          if (curStory === 0) S.storyProgress = 1;
+          else if (curStory === 1) S.storyProgress = 2;
+          else if (curStory === 2) S.storyProgress = 3;
+
+          const gained = S.storyProgress > prevProgress ? story.stars : 0;
+          if (gained > 0) {
+            S.totalStars += gained;
+          }
+          saveState();
+          updateUI();
+
+          const r = document.getElementById('quizSection').getBoundingClientRect();
+          flyStar(r.left+r.width/2, r.top, gained||1);
+
+          if (curStory < STORIES.length-1) {
+            document.getElementById('nextBtn').classList.add('show');
+            document.getElementById('retryBtn').classList.add('show');
+            setTimeout(() => showBadge('🎉','本节完成！','继续下一节吧！'), 600);
+          } else {
+            document.getElementById('retryBtn').classList.add('show');
+            setTimeout(() => {
+              showBadge('🏆','悟空学苑全部完成！','你学会了三个西游记故事！');
+              celebrate();
+            }, 600);
+          }
+        } else {
+          // 答对但还有下一题：立即显示下一题
+          quizIdx++;
+          quizAnswered = false;
+          renderQuiz();
+        }
       } else {
-        result.textContent = '🤔 不对哦，答案是蟠桃和仙丹！再想想！'; result.className = 'quiz-result fail';
-        setTimeout(() => { quizAnswered = false; opts.forEach(o => o.className = 'quiz-option'); result.style.display = 'none'; }, 2000);
+        result.textContent = `🤔 不对哦，正确答案是${'ABC'[correct]}！`; result.className = 'quiz-result fail';
+        document.getElementById('retryBtn').classList.add('show');
+        setTimeout(() => {
+          quizAnswered = false;
+          renderQuiz();
+        }, 1500);
       }
       result.style.display = 'block';
     }
 
-    function nextStory() {
-      showToast('更多故事陆续来！'); document.getElementById('nextBtn').classList.remove('show');
+    function resetQuiz() {
       quizAnswered = false;
-      const opts = document.querySelectorAll('#quizOptions .quiz-option');
-      opts.forEach(o => o.className = 'quiz-option');
-      document.getElementById('quizResult').style.display = 'none';
+      renderQuiz();
     }
 
-    // ========== 三字经 ==========
+    function nextStory() {
+      if (curStory < STORIES.length-1) {
+        curStory++;
+        quizIdx = 0;
+        quizAnswered = false;
+        renderStory();
+      }
+    }
+
+    function resetStory() {
+      if (confirm('确定要重新学习这个故事吗？星星不会重复获得哦。')) {
+        quizIdx = 0;
+        quizAnswered = false;
+        renderStory();
+      }
+    }
+
+    function updateResetArea() {
+      const done = S.storyProgress > curStory;
+      document.getElementById('resetArea').style.display = done ? 'block' : 'none';
+    }
+
+    /* ==============================================
+       三字经
+    ============================================== */
     function renderSanjijing() {
-      const nav = document.getElementById('unitNav');
+      const unit = SANJIJING[curSj];
+      const done = S.sjProgress[curSj];
+
+      // 顶部导航
+      const nav = document.getElementById('sjNav');
       nav.innerHTML = '';
-      SANJIJING_UNITS.forEach((u, i) => {
+      SANJIJING.forEach((u,i) => {
         const tab = document.createElement('button');
-        tab.className = 'unit-tab' + (i===currentSjUnit?' active':'') + (i>0&&!state.sanjijingDone[i-1]?' locked':'');
+        tab.className = 'sj-unit-tab' + (i===curSj?' active':'') + (S.sjProgress[i]?' done':'');
         tab.textContent = u.title;
-        tab.onclick = () => { if (i===0 || state.sanjijingDone[i-1]) { currentSjUnit=i; renderSanjijing(); } };
+        tab.onclick = () => { curSj=i; renderSanjijing(); };
         nav.appendChild(tab);
       });
 
-      const unit = SANJIJING_UNITS[currentSjUnit];
-      document.getElementById('unitTitle').textContent = unit.title;
-      document.getElementById('unitStars').textContent = state.sanjijingDone[currentSjUnit] ? '★★★' : '☆☆☆';
+      document.getElementById('sjTitle').textContent = unit.title;
+      document.getElementById('sjStars').textContent = done ? '★★★' : '☆☆☆';
 
-      const textEl = document.getElementById('sanjijingText');
+      // 文字
+      const textEl = document.getElementById('sjText');
       textEl.innerHTML = '';
-      for (let i=0; i<unit.text.length; i++) {
+      for (let i=0;i<unit.text.length;i++) {
+        const c = unit.text[i];
         const span = document.createElement('span');
-        span.className = 'char-highlight';
-        span.textContent = unit.text[i];
-        if (unit.text[i]==='，'||unit.text[i]==='。') span.innerHTML = unit.text[i];
+        span.className = (c==='，'||c==='。') ? 'sj-char sj-punct' : 'sj-char';
+        span.textContent = c;
         textEl.appendChild(span);
       }
-      document.getElementById('meaningText').textContent = unit.meaning;
-      document.getElementById('sanjijingQuiz').classList.remove('show');
+      document.getElementById('sjMeaning').textContent = unit.meaning;
+      document.getElementById('sjQuiz').classList.remove('show');
     }
 
-    function readSanjijing() {
-      const unit = SANJIJING_UNITS[currentSjUnit];
+    function readSj() {
+      const unit = SANJIJING[curSj];
       speak(unit.text);
-      const chars = document.querySelectorAll('.char-highlight');
+      const chars = document.querySelectorAll('.sj-char:not(.sj-punct)');
       let i=0;
       const iv = setInterval(() => {
-        chars.forEach(c => c.classList.remove('current'));
+        chars.forEach(c=>c.classList.remove('current'));
         if (i<chars.length) { chars[i].classList.add('current'); i++; }
         else clearInterval(iv);
-      }, 280);
+      }, 260);
     }
 
-    function showSanjijingQuiz() {
-      const unit = SANJIJING_UNITS[currentSjUnit];
-      const quiz = document.getElementById('sanjijingQuiz');
-      document.getElementById('sjQuestion').textContent = `"${unit.text.slice(0,4)}"中，"${unit.quiz[0].slice(0,1)}"是什么意思？`;
-      const opts = quiz.querySelectorAll('.quiz-option');
-      opts.forEach((o,i) => {
-        o.textContent = `${'ABC'[i]}. ${unit.quiz[i]}`;
-        o.className = 'quiz-option';
-      });
+    function showSjQuiz() {
+      const unit = SANJIJING[curSj];
+      const quiz = document.getElementById('sjQuiz');
       quiz.classList.add('show');
+      document.getElementById('sjQuizQ').textContent = `"${unit.text.slice(0,6)}"——${unit.quiz}`;
+      const optsEl = document.getElementById('sjQuizOpts');
+      optsEl.innerHTML = '';
+      unit.opts.forEach((opt,i) => {
+        const btn = document.createElement('button');
+        btn.className = 'sj-quiz-opt';
+        btn.textContent = `${'ABC'[i]}. ${opt}`;
+        btn.onclick = () => sjAnswer(i);
+        optsEl.appendChild(btn);
+      });
     }
 
     function sjAnswer(idx) {
-      if (state.sanjijingDone[currentSjUnit]) return;
-      const unit = SANJIJING_UNITS[currentSjUnit];
-      const opts = document.querySelectorAll('#sanjijingQuiz .quiz-option');
+      const unit = SANJIJING[curSj];
+      if (S.sjProgress[curSj]) { toast('已经答对过了！'); return; }
+      const opts = document.querySelectorAll('#sjQuizOpts .sj-quiz-opt');
       opts.forEach((o,i) => {
         if (i===unit.answer) o.classList.add('correct');
         if (i===idx && idx!==unit.answer) o.classList.add('wrong');
       });
-
       if (idx === unit.answer) {
-        state.sanjijingDone[currentSjUnit] = true;
-        state.totalStars += 1;
-        saveState(); updateUI();
-        document.getElementById('unitStars').textContent = '★★★';
-        const r = document.getElementById('sanjijingQuiz').getBoundingClientRect();
-        flyStar(r.left + r.width/2, r.top, 1);
+        S.sjProgress[curSj] = true;
+        S.totalStars += 1;
+        saveState();
+        updateUI();
+        document.getElementById('sjStars').textContent = '★★★';
+        const r = document.getElementById('sjQuiz').getBoundingClientRect();
+        flyStar(r.left+r.width/2, r.top, 1);
+        const allDone = S.sjProgress.every(Boolean);
         setTimeout(() => {
-          if (currentSjUnit < SANJIJING_UNITS.length-1) {
-            showToast('✅ 答对啦！可以学下一课了');
-            currentSjUnit++;
-            renderSanjijing();
-          } else {
-            showBadge('🏆', '三字经小达人！', '你学完了前四课！');
+          if (allDone) {
+            showBadge('🏆','三字经小达人！','你学完了前八课！');
             celebrate();
+          } else {
+            toast('✅ 答对啦！可以学下一课了');
+            if (curSj < SANJIJING.length-1) {
+              curSj++;
+              renderSanjijing();
+            }
           }
-        }, 1000);
+        }, 800);
       } else {
-        showToast('不对哦，再想想！');
-        setTimeout(() => {
-          opts.forEach(o => o.className = 'quiz-option');
-        }, 1000);
+        toast('不对哦，再想想！');
+        setTimeout(() => opts.forEach(o=>o.className='sj-quiz-opt'), 1000);
       }
     }
 
-    // ========== 声律启蒙 ==========
-    function playVerse() {
-      const v = '云对雨，雪对风，晚照对晴空';
-      speak(v);
-      const ids = ['v1','v2','v3','v4','v5','v6'];
-      ids.forEach(id => document.getElementById(id).classList.remove('active'));
+    /* ==============================================
+       声律启蒙
+    ============================================== */
+    function playSl() {
+      const ids = ['sl1','sl2','sl3','sl4','sl5','sl6'];
+      speak('云对雨，雪对风，晚照对晴空');
+      ids.forEach(id=>document.getElementById(id).classList.remove('active'));
       let i=0;
       const iv = setInterval(() => {
         if (i<ids.length) { document.getElementById(ids[i]).classList.add('active'); i++; }
-        else { setTimeout(() => ids.forEach(id=>document.getElementById(id).classList.remove('active')), 400); clearInterval(iv); }
-      }, 600);
+        else { setTimeout(()=>ids.forEach(id=>document.getElementById(id).classList.remove('active')),400); clearInterval(iv); }
+      }, 580);
     }
 
-    function showLocked() { showToast('陆续开放中，敬请期待！'); }
-
-    // ========== 对对碰 ==========
+    /* ==============================================
+       对对碰
+    ============================================== */
     function startMatch() {
       showPage('matchPage');
       document.getElementById('topTitle').textContent = '对对碰';
-      matchDone = 0;
-      matchSelected = null;
-      document.getElementById('matchCount').textContent = '0';
-      document.getElementById('matchLeft').textContent = MATCH_PAIRS.length;
-      document.getElementById('matchComplete').classList.remove('show');
+      mDone = 0;
+      mSelected = null;
+      document.getElementById('mCount').textContent = '0';
+      document.getElementById('mLeft').textContent = MATCH_PAIRS.length;
+      document.getElementById('mComplete').classList.remove('show');
 
-      const grid = document.getElementById('matchGrid');
+      const grid = document.getElementById('mGrid');
       grid.innerHTML = '';
-
-      // Shuffle for random order
-      const left = MATCH_PAIRS.map(p => p.left);
-      const right = [...MATCH_PAIRS.map(p => p.right)].sort(() => Math.random()-0.5);
-      [...left, ...right].forEach(item => {
+      const items = [...MATCH_PAIRS.map(p=>p.left), ...[...MATCH_PAIRS.map(p=>p.right)].sort(()=>Math.random()-0.5)];
+      items.forEach(item => {
+        const pair = MATCH_PAIRS.find(p=>p.left===item||p.right===item);
         const card = document.createElement('div');
-        card.className = 'match-card';
+        card.className = 'm-card';
         card.textContent = item;
-        const pair = MATCH_PAIRS.find(p => p.left===item || p.right===item);
-        card.dataset.pair = pair ? (pair.left===item ? 'L':'R') : '';
+        card.dataset.pair = pair ? (pair.left===item?'L':'R') : '';
         card.dataset.match = pair ? pair.left : '';
-        card.onclick = () => selectMatch(card);
+        card.onclick = () => selectM(card);
         grid.appendChild(card);
       });
     }
 
-    function selectMatch(card) {
+    function selectM(card) {
       if (card.classList.contains('matched')) return;
-      if (card.classList.contains('selected')) { card.classList.remove('selected'); matchSelected=null; return; }
-
-      document.querySelectorAll('.match-card').forEach(c=>c.classList.remove('selected'));
+      if (card.classList.contains('selected')) { card.classList.remove('selected'); mSelected=null; return; }
+      document.querySelectorAll('.m-card').forEach(c=>c.classList.remove('selected'));
       card.classList.add('selected');
-      matchSelected = card;
+      mSelected = card;
 
-      const selected = document.querySelectorAll('.match-card.selected');
-      if (selected.length === 2) {
-        const [a,b] = selected;
-        if (a.dataset.match === b.dataset.match && a.dataset.pair !== b.dataset.pair) {
-          [a,b].forEach(c => { c.classList.remove('selected'); c.classList.add('matched'); });
-          matchDone++;
-          document.getElementById('matchCount').textContent = matchDone;
-          document.getElementById('matchLeft').textContent = MATCH_PAIRS.length - matchDone;
-
-          if (matchDone === MATCH_PAIRS.length) {
-            if (!state.matchDone) {
-              state.matchDone = true;
-              state.totalStars += 3;
-              saveState(); updateUI();
-              const r = document.getElementById('matchGrid').getBoundingClientRect();
-              flyStar(r.left + r.width/2, r.top, 3);
-              setTimeout(() => showBadge('🏆','声律启蒙小达人！','你会对仗啦！'), 800);
+      const sel = document.querySelectorAll('.m-card.selected');
+      if (sel.length === 2) {
+        const [a,b] = sel;
+        if (a.dataset.match===b.dataset.match && a.dataset.pair!==b.dataset.pair) {
+          [a,b].forEach(c=>{ c.classList.remove('selected'); c.classList.add('matched'); });
+          mDone++;
+          document.getElementById('mCount').textContent = mDone;
+          document.getElementById('mLeft').textContent = MATCH_PAIRS.length - mDone;
+          if (mDone === MATCH_PAIRS.length) {
+            if (!S.matchDone) {
+              S.matchDone = true; S.totalStars += 3; saveState(); updateUI();
+              const r = document.getElementById('mGrid').getBoundingClientRect();
+              flyStar(r.left+r.width/2, r.top, 3);
+              setTimeout(()=>showBadge('🏆','声律启蒙小达人！','你会对仗啦！'), 600);
             }
-            setTimeout(() => {
-              document.getElementById('matchComplete').classList.add('show');
-              celebrate();
-            }, 500);
+            setTimeout(()=>{ document.getElementById('mComplete').classList.add('show'); celebrate(); }, 400);
           }
-          matchSelected = null;
+          mSelected = null;
         } else {
-          [a,b].forEach(c => {
-            if (!c.classList.contains('matched')) {
-              c.classList.add('wrong');
-              setTimeout(() => c.classList.remove('wrong'), 400);
-            }
-          });
-          setTimeout(() => { [a,b].forEach(c=>c.classList.remove('selected')); }, 400);
-          matchSelected = null;
+          [a,b].forEach(c=>{ if(!c.classList.contains('matched')) c.classList.add('wrong'); });
+          setTimeout(()=>[a,b].forEach(c=>c.classList.remove('selected','wrong')), 400);
+          mSelected = null;
         }
       }
     }
 
-    // ========== 初始化 ==========
+    /* ==============================================
+       家长中心
+    ============================================== */
+    function showParent(e) {
+      e.preventDefault();
+      showPage('parentPage');
+      document.getElementById('topTitle').textContent = '家长中心';
+    }
+
+    function renderParent() {
+      const storyDone = S.storyProgress || 0;
+      const sjDone = (S.sjProgress||[]).filter(Boolean).length;
+      const slS = S.shenglvDone ? 3 : 0;
+      const gS = S.matchDone ? 3 : 0;
+      const total = S.totalStars;
+      const pct = Math.round((total / TOTAL_STARS) * 100);
+
+      document.getElementById('pStars').textContent = total;
+      document.getElementById('pProgress').textContent = pct + '%';
+      document.getElementById('pBar').style.width = pct + '%';
+      document.getElementById('pStory').textContent = `${storyDone}/3故事`;
+      document.getElementById('pSj').textContent = `${sjDone}/${SANJIJING.length}课`;
+      document.getElementById('pSl').textContent = slS > 0 ? '已完成' : '未开始';
+      document.getElementById('pGame').textContent = gS > 0 ? '已玩过' : '未开始';
+      document.getElementById('pStreak').textContent = (S.streak||1) + '天';
+      document.getElementById('pLast').textContent = '今天';
+    }
+
+    /* ==============================================
+       初始化
+    ============================================== */
     document.addEventListener('DOMContentLoaded', () => {
+      if (S.totalStars === undefined) S = newState();
+      if (!S.storyProgress) S.storyProgress = 0;
+      if (!S.sjProgress) S.sjProgress = Array(SANJIJING.length).fill(false);
+      saveState();
       updateUI();
       renderSanjijing();
-      // Preload voices
       if ('speechSynthesis' in window) {
         speechSynthesis.getVoices();
         speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
       }
+    });
+
+    // 页可见性变化时停止语音
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopSpeech();
     });
   </script>
 </body>
