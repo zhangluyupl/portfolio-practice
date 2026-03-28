@@ -767,11 +767,7 @@
           <span class="value" id="pSj">0/8课</span>
         </div>
         <div class="parent-stat">
-          <span class="label">声律启蒙</span>
-          <span class="value" id="pSl">未开始</span>
-        </div>
-        <div class="parent-stat">
-          <span class="label">游戏</span>
+          <span class="label">对对碰</span>
           <span class="value" id="pGame">未开始</span>
         </div>
       </div>
@@ -930,8 +926,8 @@
     function updateUI() {
       const storyDone = S.storyProgress || 0;
       const sjDone = (S.sjProgress||[]).filter(Boolean).length;
-      const slS = S.shenglvDone ? 3 : 0;
-      const gS = S.matchDone ? 3 : 0;
+      const slS = S.matchDone ? 3 : 0;
+      const gS = slS; // 游戏乐园的星星和对对碰同步
 
       document.getElementById('starCount').textContent = S.totalStars;
       document.getElementById('homeStars').textContent = S.totalStars;
@@ -1256,6 +1252,7 @@
         curStory++;
         quizIdx = 0;
         quizAnswered = false;
+        saveState();
         renderStory();
       }
     }
@@ -1264,6 +1261,7 @@
       if (confirm('确定要重新学习这个故事吗？\n\n（星星已经获得了，这次温习不记新的星星哦）')) {
         quizIdx = 0;
         quizAnswered = false;
+        saveState();
         renderStory();
       }
     }
@@ -1361,6 +1359,8 @@
             toast('✅ 答对啦！可以学下一课了');
             if (curSj < SANJIJING.length-1) {
               curSj++;
+              S.sjCurrent = curSj;
+              saveState();
               renderSanjijing();
             }
           }
@@ -1457,7 +1457,6 @@
     function renderParent() {
       const storyDone = S.storyProgress || 0;
       const sjDone = (S.sjProgress||[]).filter(Boolean).length;
-      const slS = S.shenglvDone ? 3 : 0;
       const gS = S.matchDone ? 3 : 0;
       const total = S.totalStars;
       const pct = Math.round((total / TOTAL_STARS) * 100);
@@ -1467,7 +1466,6 @@
       document.getElementById('pBar').style.width = pct + '%';
       document.getElementById('pStory').textContent = `${storyDone}/3故事`;
       document.getElementById('pSj').textContent = `${sjDone}/${SANJIJING.length}课`;
-      document.getElementById('pSl').textContent = slS > 0 ? '已完成' : '未开始';
       document.getElementById('pGame').textContent = gS > 0 ? '已玩过' : '未开始';
       document.getElementById('pStreak').textContent = (S.streak||1) + '天';
       document.getElementById('pLast').textContent = '今天';
