@@ -850,7 +850,7 @@
 
     const SANJIJING = [
       { title: '第一课', text: '人之初，性本善，性相近，习相远', meaning: '人出生的时候，本性都是善良的。后来因为生活环境不同，性情就变坏了。', quiz: '这句中，"初"是什么意思？', opts: ['开始、最开始', '衣服', '刀子'], answer: 0 },
-      { title: '第二课', text: '苟不教，性乃迁，教之道，贵以专', meaning: '如果不好好教育他，善良的本性就会变坏。教育的方法，最重要的是专心致志、持之以恒。', quiz: '"贵以专"中的"贵"是什么意思？', opts: ['贵重、重要', '很贵的意思', '乌龟的意思'], answer: 0 },
+      { title: '第二课', text: '苟不教，性乃迁，教之道，贵以专', meaning: '如果不好好教育他，善良的本性就会变坏。教育的方法，最重要的是专心致志、持之以恒。', quiz: '"贵以专"中的"贵"是什么意思？', opts: ['贵重、重要', '很便宜的意思', '买得起的意思'], answer: 0 },
       { title: '第三课', text: '昔孟母，择邻处，子不学，断机杼', meaning: '从前孟子的母亲，为了让孟子有好的学习环境，三次搬家选择邻居。孟子不好好学习时，母亲剪断了织布（以此告诫）。', quiz: '孟母为什么三次搬家？', opts: ['不喜欢原来的房子', '为了给孟子找好的学习环境', '为了离河流近'], answer: 1 },
       { title: '第四课', text: '窦燕山，有义方，教五子，名俱扬', meaning: '窦燕山教育孩子有好的方法，五个孩子都很有成就，名声都传扬开了。', quiz: '"五子"是什么意思？', opts: ['五个儿子', '五个学生', '五个人'], answer: 0 },
       { title: '第五课', text: '养不教，父之过，教不严，师之惰', meaning: '生了孩子却不教育，是父亲的过错；教育学生不严格，是老师的懒惰。', quiz: '"父之过"是什么意思？', opts: ['父亲的错误', '父亲的过程', '父亲的家'], answer: 0 },
@@ -891,17 +891,19 @@
         shenglvDone: false,
         matchDone: false,
         streak: 1,
-        lastDate: today(),
+        lastDate: localDateStr(),
       };
     }
 
     function loadState() {
       try {
         const d = JSON.parse(localStorage.getItem('xjkids_v3') || '{}');
-        // 校验日期
-        if (d.lastDate !== today()) {
-          d.streak = (d.lastDate === yesterday()) ? (d.streak||1)+1 : 1;
-          d.lastDate = today();
+        const todayStr = localDateStr();
+        // 校验日期（用本地日期，跨本地日界才算新一天）
+        if (d.lastDate !== todayStr) {
+          const yesterdayStr = localDateStr(-1);
+          d.streak = (d.lastDate === yesterdayStr) ? (d.streak||1)+1 : 1;
+          d.lastDate = todayStr;
           saveState(d);
         }
         return d;
@@ -913,11 +915,17 @@
       localStorage.setItem('xjkids_v3', JSON.stringify(d));
     }
 
-    function today() { return new Date().toISOString().slice(0,10); }
-    function yesterday() {
-      const d = new Date(); d.setDate(d.getDate()-1);
-      return d.toISOString().slice(0,10);
+    // 使用本地日期字符串（避免 UTC 日界问题）
+    function localDateStr(offsetDays) {
+      const d = new Date();
+      if (offsetDays) d.setDate(d.getDate() + offsetDays);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
     }
+    const today = () => localDateStr();
+    const yesterday = () => localDateStr(-1);
 
     function updateUI() {
       const storyDone = S.storyProgress || 0;
@@ -1091,6 +1099,9 @@
     ============================================== */
     function renderStory() {
       stopSpeech();
+      // 保险：如果是复习但 quizIdx 已越界，重置
+      if (quizIdx >= STORIES[curStory].knowledge.length) quizIdx = 0;
+      quizAnswered = false;
       const story = STORIES[curStory];
 
       document.getElementById('storyEmoji').textContent = story.emoji;
