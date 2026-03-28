@@ -585,7 +585,8 @@
           <span>🔊</span><span id="playBtnText">听悟空讲故事</span>
         </button>
         <div class="quiz-section" id="quizSection">
-          <div class="quiz-title">🧠 答对得星星</div>
+          <div class="quiz-title" id="quizTitle">🧠 答对得星星</div>
+          <div id="reviewBanner" style="display:none;background:rgba(255,217,61,0.15);border-radius:10px;padding:8px 14px;margin-bottom:12px;font-size:13px;color:#FFD93D;text-align:center;">📖 复习模式 · 温故知新</div>
           <div class="quiz-question" id="quizQuestion"></div>
           <div class="quiz-options" id="quizOptions"></div>
           <div class="quiz-result" id="quizResult"></div>
@@ -849,7 +850,7 @@
 
     const SANJIJING = [
       { title: '第一课', text: '人之初，性本善，性相近，习相远', meaning: '人出生的时候，本性都是善良的。后来因为生活环境不同，性情就变坏了。', quiz: '这句中，"初"是什么意思？', opts: ['开始、最开始', '衣服', '刀子'], answer: 0 },
-      { title: '第二课', text: '苟不教，性乃迁，教之道，贵以专', meaning: '如果不好好教育他，善良的本性就会变坏。教育的方法，最重要的是专心致志、持之以恒。', quiz: '"贵以专"中的"贵"是什么意思？', opts: ['贵重、重要', '有钱', '乌龟'], answer: 0 },
+      { title: '第二课', text: '苟不教，性乃迁，教之道，贵以专', meaning: '如果不好好教育他，善良的本性就会变坏。教育的方法，最重要的是专心致志、持之以恒。', quiz: '"贵以专"中的"贵"是什么意思？', opts: ['贵重、重要', '很贵的意思', '乌龟的意思'], answer: 0 },
       { title: '第三课', text: '昔孟母，择邻处，子不学，断机杼', meaning: '从前孟子的母亲，为了让孟子有好的学习环境，三次搬家选择邻居。孟子不好好学习时，母亲剪断了织布（以此告诫）。', quiz: '孟母为什么三次搬家？', opts: ['不喜欢原来的房子', '为了给孟子找好的学习环境', '为了离河流近'], answer: 1 },
       { title: '第四课', text: '窦燕山，有义方，教五子，名俱扬', meaning: '窦燕山教育孩子有好的方法，五个孩子都很有成就，名声都传扬开了。', quiz: '"五子"是什么意思？', opts: ['五个儿子', '五个学生', '五个人'], answer: 0 },
       { title: '第五课', text: '养不教，父之过，教不严，师之惰', meaning: '生了孩子却不教育，是父亲的过错；教育学生不严格，是老师的懒惰。', quiz: '"父之过"是什么意思？', opts: ['父亲的错误', '父亲的过程', '父亲的家'], answer: 0 },
@@ -1035,19 +1036,32 @@
     function speak(text) {
       if (!('speechSynthesis' in window)) { toast('浏览器不支持朗读'); return; }
       window.speechSynthesis.cancel();
-      speechUtterance = new SpeechSynthesisUtterance(text);
-      speechUtterance.lang = 'zh-CN';
-      speechUtterance.rate = 0.82;
-      speechUtterance.pitch = 1.1;
-      const voices = window.speechSynthesis.getVoices();
-      const zh = voices.find(v => v.lang.includes('zh'));
-      if (zh) speechUtterance.voice = zh;
-      speechUtterance.onend = () => { isPlaying = false; updatePlayBtn(); };
-      speechUtterance.onerror = () => { isPlaying = false; updatePlayBtn(); };
-      speechUtterance.onstart = () => { isPlaying = true; updatePlayBtn(); };
-      window.speechSynthesis.speak(speechUtterance);
-      isPlaying = true;
-      updatePlayBtn();
+
+      // Safari 等浏览器的 voices 是异步加载的，尝试获取，失败则用默认
+      let zhVoice = null;
+      const trySpeak = () => {
+        const voices = window.speechSynthesis.getVoices();
+        zhVoice = voices.find(v => v.lang.includes('zh')) || null;
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'zh-CN';
+        utt.rate = 0.82;
+        utt.pitch = 1.1;
+        if (zhVoice) utt.voice = zhVoice;
+        utt.onend = () => { isPlaying = false; updatePlayBtn(); };
+        utt.onerror = () => { isPlaying = false; updatePlayBtn(); };
+        utt.onstart = () => { isPlaying = true; updatePlayBtn(); };
+        window.speechSynthesis.speak(utt);
+        isPlaying = true;
+        updatePlayBtn();
+      };
+
+      // Safari 首次 voices 可能为空，延迟后重试一次
+      setTimeout(() => {
+        if (window.speechSynthesis.getVoices().length === 0) {
+          window.speechSynthesis.cancel();
+          trySpeak();
+        }
+      }, 600);
     }
 
     function stopSpeech() {
@@ -1096,7 +1110,7 @@
       STORIES.forEach((s,i) => {
         const d = document.createElement('div');
         d.className = 'story-dot' + (i===curStory?' active':'') + (i<curStory?' done':'');
-        d.onclick = () => { curStory=i; quizIdx=0; quizAnswered=false; renderStory(); };
+        d.onclick = () => { curStory=i; quizIdx=0; quizAnswered=false; saveState(); renderStory(); };
         dotsEl.appendChild(d);
       });
 
@@ -1106,7 +1120,10 @@
 
     function renderQuiz() {
       const story = STORIES[curStory];
-      // 星星已获得则不允许重复答第一题（resetStory 里有 quizIdx=0 会重新开始）
+      // 复习：已完成的故事（storyProgress > curStory）
+      // 未解锁的故事（storyProgress < curStory，且不是已完成）：显示提示
+      const isReview = S.storyProgress > curStory;
+      const isLocked = S.storyProgress < curStory;
 
       document.getElementById('quizQuestion').textContent = `(${quizIdx+1}/${story.knowledge.length}) ${story.knowledge[quizIdx].q}`;
 
@@ -1123,6 +1140,26 @@
       document.getElementById('quizResult').style.display = 'none';
       document.getElementById('retryBtn').classList.remove('show');
       document.getElementById('nextBtn').classList.remove('show');
+      document.getElementById('reviewBanner').style.display = isReview ? 'block' : 'none';
+      document.getElementById('quizTitle').textContent = isReview ? '🧠 温习答题' : '🧠 答对得星星';
+
+      // 未解锁的故事，显示锁定提示
+      const quizSection = document.getElementById('quizSection');
+      const lockNote = document.getElementById('lockNote');
+      if (isLocked) {
+        if (!lockNote) {
+          const note = document.createElement('div');
+          note.id = 'lockNote';
+          note.style.cssText = 'text-align:center;padding:16px;background:rgba(255,255,255,0.05);border-radius:14px;margin-top:12px;font-size:14px;color:rgba(255,255,255,0.5);';
+          note.textContent = '🔒 先完成上一个故事才能解锁这里哦';
+          quizSection.appendChild(note);
+        }
+        // 禁用选项点击
+        document.querySelectorAll('#quizOptions .quiz-option').forEach(o => o.style.pointerEvents = 'none');
+      } else if (lockNote) {
+        lockNote.remove();
+        document.querySelectorAll('#quizOptions .quiz-option').forEach(o => o.style.pointerEvents = '');
+      }
     }
 
     function answerQuiz(idx) {
@@ -1144,32 +1181,39 @@
         const lastQ = quizIdx === story.knowledge.length-1;
 
         if (lastQ) {
-          // 全部答对
-          const prevProgress = S.storyProgress || 0;
-          if (curStory === 0) S.storyProgress = 1;
-          else if (curStory === 1) S.storyProgress = 2;
-          else if (curStory === 2) S.storyProgress = 3;
+          const isReview = S.storyProgress > curStory;
+          if (!isReview) {
+            // 首次通关
+            const prevProgress = S.storyProgress || 0;
+            if (curStory === 0) S.storyProgress = 1;
+            else if (curStory === 1) S.storyProgress = 2;
+            else if (curStory === 2) S.storyProgress = 3;
 
-          const gained = S.storyProgress > prevProgress ? story.stars : 0;
-          if (gained > 0) {
-            S.totalStars += gained;
-          }
-          saveState();
-          updateUI();
+            const gained = S.storyProgress > prevProgress ? story.stars : 0;
+            if (gained > 0) {
+              S.totalStars += gained;
+            }
+            saveState();
+            updateUI();
 
-          const r = document.getElementById('quizSection').getBoundingClientRect();
-          flyStar(r.left+r.width/2, r.top, gained||1);
+            const r = document.getElementById('quizSection').getBoundingClientRect();
+            flyStar(r.left+r.width/2, r.top, gained||1);
 
-          if (curStory < STORIES.length-1) {
-            document.getElementById('nextBtn').classList.add('show');
-            document.getElementById('retryBtn').classList.add('show');
-            setTimeout(() => showBadge('🎉','本节完成！','继续下一节吧！'), 600);
+            if (curStory < STORIES.length-1) {
+              document.getElementById('nextBtn').classList.add('show');
+              document.getElementById('retryBtn').classList.add('show');
+              setTimeout(() => showBadge('🎉','本节完成！','继续下一节吧！'), 600);
+            } else {
+              document.getElementById('retryBtn').classList.add('show');
+              setTimeout(() => {
+                showBadge('🏆','悟空学苑全部完成！','你学会了三个西游记故事！');
+                celebrate();
+              }, 600);
+            }
           } else {
+            // 复习模式：只显示重试
             document.getElementById('retryBtn').classList.add('show');
-            setTimeout(() => {
-              showBadge('🏆','悟空学苑全部完成！','你学会了三个西游记故事！');
-              celebrate();
-            }, 600);
+            toast('📖 复习完成，温故知新！');
           }
         } else {
           // 答对但还有下一题：显示反馈，1200ms后再显示下一题
@@ -1429,8 +1473,8 @@
       updateUI();
       renderSanjijing();
       if ('speechSynthesis' in window) {
-        speechSynthesis.getVoices();
         speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        speechSynthesis.getVoices(); // 触发 Safari 等浏览器的 voice 加载
       }
     });
 
