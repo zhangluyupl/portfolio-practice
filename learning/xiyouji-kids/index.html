@@ -203,6 +203,7 @@
     .story-dot {
       width: 32px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25);
       transition: all 0.3s ease; cursor: pointer;
+      display: inline-block;
     }
     .story-dot.active { background: #FFD93D; width: 48px; }
     .story-dot.done { background: rgba(255,217,61,0.5); }
@@ -869,8 +870,8 @@
        状态
     ============================================== */
     let S = loadState();
-    let curStory = 0;
-    let curSj = 0;
+    let curStory = Math.min(S.storyProgress || 0, STORIES.length - 1);
+    let curSj = Math.min(S.sjCurrent || 0, SANJIJING.length - 1);
     let quizIdx = 0;
     let quizAnswered = false;
     let mSelected = null;
@@ -1205,7 +1206,7 @@
     }
 
     function resetStory() {
-      if (confirm('确定要重新学习这个故事吗？星星不会重复获得哦。')) {
+      if (confirm('确定要重新学习这个故事吗？\n\n（星星已经获得了，这次温习不记新的星星哦）')) {
         quizIdx = 0;
         quizAnswered = false;
         renderStory();
@@ -1231,7 +1232,7 @@
         const tab = document.createElement('button');
         tab.className = 'sj-unit-tab' + (i===curSj?' active':'') + (S.sjProgress[i]?' done':'');
         tab.textContent = u.title;
-        tab.onclick = () => { curSj=i; renderSanjijing(); };
+        tab.onclick = () => { curSj=i; S.sjCurrent=i; saveState(); renderSanjijing(); };
         nav.appendChild(tab);
       });
 
