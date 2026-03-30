@@ -32,6 +32,17 @@
 
 ## 本地知识库
 
+### OpenClaw 官方文档（已抓取）
+- 路径：`learning/openclaw-official/`
+- 文件：
+  - `agent-workspace.md` — workspace 官方文档
+  - `memory-overview.md` — 记忆机制官方说明
+  - `multi-agent.md` — 多 Agent 路由配置
+  - `cron-vs-heartbeat.md` — Heartbeat vs Cron 使用场景
+  - `skills.md` — Skills 系统完整说明
+  - `architecture-tangshiye.md` — 汤师爷万字架构分析（628行）
+- 状态：📥 已抓取，待内化
+
 ### 资治通鉴
 - 路径：`learning/zztj/`
 - 内容：熊逸讲透资治通鉴791条笔记（2.85MB）
