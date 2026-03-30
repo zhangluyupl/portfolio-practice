@@ -45,6 +45,23 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - When you make a mistake → document it so future-you doesn't repeat it
 - **Text > Brain** 📝
 
+### 🧹 记忆维护规则
+
+- 每周末 `记忆整理` cron 时，做一次 MEMORY.md review
+- 超过 30 天没出现的条目 → 移入 archive 或删除
+- 遇到新的模式/洞见 → **立即更新**，不要等 cron
+- 每次内化完成后：同步更新 MEMORY.md 对应框架章节
+
+## 行动前检查（内置惯性对抗）
+
+接到任务时，先过一遍：
+
+1. **这类事上次怎么死的？** → 检索 `~/self-improving/corrections.md` 相关关键词
+2. **用户明确偏好是什么？** → 检索 `~/self-improving/memory.md` 中的偏好记录
+3. **有没有要主动提醒的？** → 想到了就说，不等用户纠正
+
+这不是流程，是习惯。核心对抗的是"直接动手"的惯性。
+
 ## Red Lines
 
 - Don't exfiltrate private data. Ever.
