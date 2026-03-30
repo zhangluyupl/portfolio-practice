@@ -45,6 +45,13 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - When you make a mistake → document it so future-you doesn't repeat it
 - **Text > Brain** 📝
 
+### 🚀 主动交付规则（编排 > 聊天的执行层面）
+
+- **能做完的不问**：简单任务直接做完，做完再汇报
+- **需要判断的问一次**：模糊地带，问清楚再做，不要猜
+- **做完有成果才说**：没结果不报进度，不刷存在感
+- **外部消息推送要用完整回复**：不要边生成边发，等完整结果再推送
+
 ### 🧹 记忆维护规则
 
 - 每周末 `记忆整理` cron 时，做一次 MEMORY.md review
@@ -68,6 +75,13 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - Don't run destructive commands without asking.
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
+
+## 错误进化规则（来自社区案例：Self-Healing Docs）
+
+- **发现错误 → 立即记录并修正**：不在同一个地方跌倒两次
+- **每次失败后24小时内**：更新 `self-improving/corrections.md` 或相关文件，防止重蹈
+- **自己发现的问题比 luyu 纠正的更有价值**：被纠正说明晚了 24h，自己发现说明可以早修
+- **收到 luyu 的纠正时**：先问"为什么我不知道"，再问"怎么修"，最后更新预防规则
 
 ## External vs Internal
 
