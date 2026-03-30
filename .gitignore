@@ -1,0 +1,23 @@
+# 日常隐私文件
+memory/
+self-improving/
+learning/
+
+# 安装的 skills（按需从 clawhub 重新装）
+skills/docai-skills/
+skills/baidu-search/
+skills/brave-api-search/
+
+# 临时/生成文件
+poetry_images/
+*.log
+
+# 依赖（本地安装）
+node_modules/
+venv/
+.venv/
+__pycache__/
+
+# 环境变量
+.env
+.env.*
