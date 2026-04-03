@@ -18,6 +18,15 @@ description: |
 3. **调用 API 生成** - 使用 image-01 模型
 4. **下载并发送** - 通过 openclaw-weixin 发送给用户
 
+## ⚠️ 生成前必查（后悔药机制）
+
+**每次生成图片前，先强制检索 `~/self-improving/corrections.md`**，确认没有相关失败教训。如果有，在调用API之前先说出来或问清楚。
+
+**检索关键词：** 当前任务的主体 + 风格 + 场景
+- 例如"唱歌+国风" → 检索"图片"、"审美"、"国风"相关教训
+
+---
+
 ## Step 1: 优化提示词
 
 image-01 擅长真实摄影风格，中文描述需要转成英文。
@@ -107,3 +116,31 @@ openclaw message send --channel openclaw-weixin --target "o9cq809eGr7RPqXvU6WWeq
 - 默认 16:9 横版，如需竖版可用 "3:4"
 - 如需中文元素融入图片，prompt 要明确写出 Chinese style, Hanfu, traditional Chinese 等
 - 图片 URL 有时效，尽快下载发送
+
+---
+
+## 公众号/视频号内容风格（默认设置）
+
+**封面图默认风格：anime/cartoon（卡通动漫风格）**
+- clean lines, soft colors, high quality cartoon
+- 人物：戴眼镜的程序员爸爸 + 传统文化元素（古籍、山水）
+- 场景：温馨书房或现代家居
+
+**公众号封面图（重要！）：**
+- ⚠️ 宽高比：**21:9**（MiniMax API 不支持 2.35:1，用 21:9 ≈ 2.33:1）
+- 推荐尺寸：900×383 px 或 1080×450 px（裁剪到 21:9 即可）
+- 文件大小：≤ 5MB
+- 格式：JPG/PNG
+
+**公众号配图（文中插图）：**
+- 风格：简约卡通 + 中国风元素
+- 比例：3:4 竖版（公众号封面是 2.35:1，不要混淆）
+- prompt 示例：
+  ```
+  A cute cartoon style Chinese programmer father with glasses, sitting at desk working on laptop, beside him traditional Chinese ancient philosophy books, warm cozy study room, anime style illustration, clean lines, soft colors, 3:4 vertical aspect ratio
+  ```
+
+**视频号封面：**
+- 风格：真人感卡通 or 写实插画
+- 比例：9:16 竖版
+- 要体现内容主题（育儿/历史/程序员）
